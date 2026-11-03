@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0284c7" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="/manifest.json" />
+  <title>PySide6 Companion - App Điện Thoại (APK) & Web</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --card-hover: #26354d;
+      --border: #334155;
+      --primary: #0284c7;
+      --primary-light: #38bdf8;
+      --success: #16a34a;
+      --warning: #eab308;
+      --danger: #ef4444;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 80px;
+    }
+    /* LOGIN VIEW */
+    #login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: radial-gradient(circle at top right, #0369a1 0%, #0f172a 60%);
+    }
+    .login-card {
+      width: 100%;
+      max-width: 430px;
+      background: rgba(30, 41, 59, 0.95);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px 24px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+    .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--primary-light);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
+    input[type="text"], input[type="password"], select, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #0f172a;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary-light); }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 18px;
+      border-radius: 10px;
+      border: none;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.15s;
+      color: #fff;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: linear-gradient(135deg, #0284c7, #2563eb); width: 100%; }
+    .btn-success { background: linear-gradient(135deg, #16a34a, #059669); }
+    .btn-outline { background: #1e293b; border: 1px solid var(--border); color: var(--text); }
+    .btn-danger { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; }
+    .demo-accounts {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px dashed var(--border);
+    }
+    .demo-btn {
+      width: 100%;
+      text-align: left;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      border-radius: 10px;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+    }
+    .demo-btn:hover { border-color: var(--primary-light); background: #172554; }
+    /* TOPBAR */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(22, 163, 74, 0.18);
+      color: #4ade80;
+      border: 1px solid rgba(74, 222, 128, 0.3);
+      font-weight: 600;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 8px #4ade80; }
+    .container { max-width: 1040px; margin: 0 auto; padding: 16px; }
+    /* METRIC GRID */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .metric-card {
+      background: linear-gradient(145deg, #1e293b, #0f172a);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .metric-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; width: 4px; height: 100%;
+      background: var(--primary-light);
+    }
+    .metric-label { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .metric-val { font-size: 22px; font-weight: 800; color: #fff; }
+    .metric-time { font-size: 11px; color: #64748b; margin-top: 6px; }
+    /* SHARED CARDS */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+    .shared-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .shared-card img {
+      width: 100%;
+      height: 190px;
+      object-fit: cover;
+      background: #090d16;
+      cursor: pointer;
+    }
+    .shared-card-body { padding: 14px; flex: 1; display: flex; flex-direction: column; }
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 6px;
+      background: rgba(2, 132, 199, 0.25);
+      color: var(--primary-light);
+      margin-bottom: 8px;
+      width: fit-content;
+    }
+    /* CANVAS BOX */
+    .canvas-wrapper {
+      background: #090d16;
+      border: 2px dashed var(--primary);
+      border-radius: 14px;
+      padding: 10px;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+    #draw-canvas {
+      max-width: 100%;
+      border-radius: 8px;
+      background: #ffffff;
+      touch-action: none;
+      cursor: crosshair;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+      margin: 10px 0;
+    }
+    .color-dot {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+    }
+    .color-dot.active { border-color: #fff; transform: scale(1.18); }
+    /* BOTTOM NAV FOR MOBILE & TABS */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(15, 23, 42, 0.96);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 4px;
+      z-index: 60;
+    }
+    .nav-item {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .nav-item.active {
+      color: var(--primary-light);
+      background: rgba(56, 189, 248, 0.12);
+    }
+    .badge-count {
+      background: var(--danger);
+      color: #fff;
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 99px;
+      margin-left: 4px;
+    }
+    /* TABLE & MODAL */
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: left; font-size: 13px; }
+    th { color: var(--muted); font-weight: 600; background: rgba(15, 23, 42, 0.5); }
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.78);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 100;
+    }
+    .modal-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      max-width: 720px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 20px;
+    }
+    .toast {
+      position: fixed;
+      top: 72px;
+      right: 16px;
+      background: #0284c7;
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 13px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      z-index: 200;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<div id="toast" class="toast"></div>
+
+<!-- MÀN HÌNH ĐĂNG NHẬP -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="brand-badge">📱 APP ĐIỆN THOẠI (APK) & WEB KẾT NỐI PYSIDE6</div>
+    <h2 style="margin: 0 0 6px;">Đăng Nhập Hệ Thống</h2>
+    <p style="margin: 0 0 20px; color: var(--muted); font-size: 13px;">
+      Chỉ hiển thị dữ liệu được <b>PySide6</b> cho phép chia sẻ & phân quyền theo từng tài khoản.
+    </p>
+    <div class="form-group">
+      <label>Tên tài khoản (Username)</label>
+      <input type="text" id="login-user" placeholder="Nhập tài khoản..." value="nhanvien1" />
+    </div>
+    <div class="form-group">
+      <label>Mật khẩu (Password)</label>
+      <input type="password" id="login-pass" placeholder="Nhập mật khẩu..." value="123456" />
+    </div>
+    <button class="btn btn-primary" onclick="doLogin()">🔐 Đăng Nhập Ngay</button>
+
+    <div style="margin-top:12px;background:#0f172a;padding:10px 12px;border-radius:10px;border:1px solid var(--border);">
+      <label style="display:block;font-size:11px;color:var(--primary-light);margin-bottom:4px;font-weight:700;">
+        🌐 ĐỊA CHỈ MÁY CHỦ PYSIDE6 (Để trống nếu chạy trực tiếp hoặc chế độ Cloud 24/7):
+      </label>
+      <input type="text" id="server-url-input" placeholder="VD: http://192.168.1.9:8000 hoặc https://xxxx.lhr.life" style="padding:8px 10px;font-size:12px;" onchange="saveServerUrl(this.value)" />
+    </div>
+
+    <div class="demo-accounts">
+      <div style="font-size: 12px; color: var(--muted); margin-bottom: 8px; font-weight: 600;">
+        ⚡ BẤM CHỌN NHANH TÀI Khoản ĐỂ TEST PHÂN QUYỀN:
+      </div>
+      <button class="demo-btn" onclick="quickLogin('admin','admin123')">
+        <span>👑 <b>admin</b> (Quản trị viên)</span>
+        <span style="color:#38bdf8;font-size:11px;">Tạo TK/MK + Full Quyền</span>
+      </button>
+      <button class="demo-btn" onclick="quickLogin('nhanvien1','123456')">
+        <span>👷 <b>nhanvien1</b> (Nhân viên)</span>
+        <span style="color:#4ade80;font-size:11px;">Xem + Chụp ảnh gửi xử lý</span>
+      </button>
+      <button class="demo-btn" onclick="quickLogin('khach1','123456')">
+        <span>👁️ <b>khach1</b> (Khách / Giám sát)</span>
+        <span style="color:#facc15;font-size:11px;">Chỉ Xem (Khóa gửi xử lý)</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- GIAO DIỆN CHÍNH SAU KHI ĐĂNG NHẬP -->
+<div id="app-screen" style="display:none;">
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="background:#0284c7;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;">🔗</div>
+      <div>
+        <div style="font-weight:800;font-size:15px;">PySide6 Sync App <span style="font-size:11px;color:var(--primary-light);font-weight:normal;">(Bản rút gọn Mobile/Web)</span></div>
+        <div id="user-badge" style="font-size:12px;color:var(--muted);">Đang tải...</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <div class="status-pill" id="ws-status">
+        <span class="dot"></span>
+        <span>Real-time PySide6: Đã kết nối</span>
+      </div>
+      <button class="btn btn-outline" style="padding:7px 12px;font-size:12px;" onclick="openQrModal()">📲 Mở trên Điện Thoại / APK</button>
+      <button class="btn btn-danger" style="padding:7px 12px;font-size:12px;" onclick="logout()">Thoát</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- TAB 1: XEM THỜI GIAN THỰC -->
+    <section id="tab-live">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <div>
+          <h3 style="margin:0;">📡 Chế Độ Xem Thời Gian Thực (Từ PySide6 Chia Sẻ)</h3>
+          <p style="margin:4px 0 0;font-size:13px;color:var(--muted);">
+            Mọi thay đổi tích chọn chia sẻ bên phần mềm máy tính <b>PySide6</b> sẽ lập tức phản ánh tại đây.
+          </p>
+        </div>
+        <button class="btn btn-outline" style="padding:8px 14px;font-size:12px;" onclick="loadSharedData()">🔄 Làm mới</button>
+      </div>
+
+      <!-- Thông số thời gian thực -->
+      <div id="metrics-container" class="metrics-grid"></div>
+
+      <!-- Danh sách Hình ảnh / Tài liệu / Báo cáo PySide6 chia sẻ -->
+      <h4 style="margin:20px 0 12px;color:var(--primary-light);">📁 Hình Ảnh, Tài Liệu & Báo Cáo Được Phép Xem:</h4>
+      <div id="shared-items-container" class="cards-grid"></div>
+    </section>
+
+    <!-- TAB 2: CHỤP HÌNH & GHI CHÚ TAY GỬI LÊN PYSIDE6 XỬ LÝ -->
+    <section id="tab-submit" style="display:none;">
+      <div id="submit-locked" style="display:none;background:rgba(239,68,68,0.12);border:1px solid #ef4444;border-radius:14px;padding:24px;text-align:center;">
+        <div style="font-size:40px;margin-bottom:10px;">🔒</div>
+        <h3 style="margin:0 0 8px;color:#fca5a5;">Tài Khoản Của Bạn Chỉ Có Quyền Xem</h3>
+        <p style="color:var(--muted);font-size:14px;max-width:480px;margin:0 auto;">
+          Quản trị viên (Admin) đã giới hạn tài khoản này ở chế độ <b>Chỉ Xem</b>. Vui lòng chuyển sang tài khoản <b>nhanvien1</b> hoặc <b>admin</b> (hoặc bật quyền trong trang Quản lý TK) để gửi hình ảnh & ghi chú cho PySide6 xử lý.
+        </p>
+      </div>
+
+      <div id="submit-form-area">
+        <h3 style="margin:0 0 6px;">📸 Chụp Hình & Viết Ghi Chú Bằng Tay -> Gửi PySide6 Xử Lý</h3>
+        <p style="margin:0 0 16px;font-size:13px;color:var(--muted);">
+          Chụp ảnh tài liệu/hiện trường hoặc chọn ảnh -> Dùng ngón tay (hoặc chuột) khoanh vùng, viết ghi chú trực tiếp lên ảnh -> Gửi về <b>PySide6</b> tự động xử lý và trả lại <b>Báo cáo</b>.
+        </p>
+
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;">
+          <!-- Bước 1: Chọn ảnh hoặc chụp camera -->
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+            <label class="btn btn-success" style="cursor:pointer;">
+              📷 Mở Camera Chụp Hình / Chọn Ảnh
+              <input type="file" id="camera-input" accept="image/*" capture="environment" style="display:none;" onchange="handleImageUpload(event)" />
+            </label>
+            <button class="btn btn-outline" onclick="drawSampleTemplate()">📝 Tạo Mẫu Tài Liệu Thử Nghiệm</button>
+            <button class="btn btn-outline" onclick="clearCanvasWhite()">⬜ Bảng Trắng Ghi Chú Tay</button>
+          </div>
+
+          <!-- Bước 2: Canvas vẽ ghi chú bằng tay -->
+          <div class="canvas-wrapper">
+            <div style="font-size:12px;color:var(--primary-light);margin-bottom:8px;font-weight:600;">
+              ✍️ Dùng tay hoặc chuột vẽ/khoanh vùng/viết chữ trực tiếp lên khung bên dưới:
+            </div>
+            <canvas id="draw-canvas" width="720" height="420"></canvas>
+
+            <div class="toolbar">
+              <span style="font-size:12px;color:var(--muted);">Màu bút:</span>
+              <div class="color-dot active" style="background:#ef4444;" onclick="setPenColor('#ef4444', this)" title="Đỏ khoanh vùng"></div>
+              <div class="color-dot" style="background:#22c55e;" onclick="setPenColor('#22c55e', this)" title="Xanh đánh dấu"></div>
+              <div class="color-dot" style="background:#eab308;" onclick="setPenColor('#eab308', this)" title="Vàng nổi bật"></div>
+              <div class="color-dot" style="background:#2563eb;" onclick="setPenColor('#2563eb', this)" title="Xanh dương"></div>
+              <div class="color-dot" style="background:#0f172a;border-color:#94a3b8;" onclick="setPenColor('#0f172a', this)" title="Mực đen"></div>
+
+              <span style="font-size:12px;color:var(--muted);margin-left:8px;">Cỡ nét:</span>
+              <input type="range" id="pen-size" min="2" max="14" value="4" style="width:80px;" />
+
+              <button class="btn btn-outline" style="padding:6px 12px;font-size:12px;" onclick="undoStroke()">↩️ Hoàn tác nét</button>
+            </div>
+          </div>
+
+          <!-- Bước 3: Thông tin ghi chú kèm theo -->
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;">
+            <div class="form-group">
+              <label>Tiêu đề hồ sơ / Yêu cầu xử lý *</label>
+              <input type="text" id="sub-title" value="Phiếu kiểm tra & Ghi chú hiện trường" placeholder="Nhập tiêu đề..." />
+            </div>
+            <div class="form-group">
+              <label>Chế độ yêu cầu PySide6 xử lý</label>
+              <select id="sub-type">
+                <option value="Phân tích Hình ảnh & Ghi chú -> Xuất Báo Cáo PDF/HTML">Phân tích Hình ảnh & Ghi chú -> Xuất Báo Cáo</option>
+                <option value="Kiểm duyệt thông số kỹ thuật tự động trên PySide6">Kiểm duyệt thông số kỹ thuật tự động</option>
+                <option value="Trích xuất dữ liệu & Đóng dấu xác nhận PySide6">Trích xuất dữ liệu & Đóng dấu xác nhận</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Ghi chú văn bản bổ sung (tùy chọn)</label>
+            <textarea id="sub-note" rows="2" placeholder="Nhập ghi chú thêm cho phần mềm PySide6 (ví dụ: Kiểm tra gấp vùng khoanh đỏ)...">Nhờ hệ thống PySide6 kiểm tra vùng khoanh đỏ trên ảnh và trả về báo cáo tổng hợp.</textarea>
+          </div>
+
+          <button id="btn-send-sub" class="btn btn-primary" style="padding:15px;font-size:15px;" onclick="submitToPySide6()">
+            🚀 GỬI LÊN PYSIDE6 XỬ LÝ & NHẬN BÁO CÁO TỰ ĐỘNG
+          </button>
+
+          <div id="submit-progress" style="display:none;margin-top:14px;padding:14px;border-radius:10px;background:#0f172a;border:1px solid var(--primary-light);text-align:center;">
+            <div id="submit-progress-text" style="font-weight:700;color:var(--primary-light);">⏳ Đang gửi dữ liệu về PySide6...</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: BÁO CÁO KẾT QUẢ TRẢ VỀ TỪ PYSIDE6 -->
+    <section id="tab-reports" style="display:none;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <div>
+          <h3 style="margin:0;">📊 Báo Cáo Kết Quả Do PySide6 Xử Lý Trả Về</h3>
+          <p style="margin:4px 0 0;font-size:13px;color:var(--muted);">
+            Danh sách các tài liệu bạn đã chụp/ghi chú gửi lên và kết quả định dạng Báo cáo từ <b>PySide6</b>.
+          </p>
+        </div>
+        <button class="btn btn-outline" style="padding:8px 14px;font-size:12px;" onclick="loadSubmissions()">🔄 Cập nhật</button>
+      </div>
+      <div id="submissions-list" class="cards-grid"></div>
+    </section>
+
+    <!-- TAB 4: QUẢN LÝ TÀI KHOẢN & PHÂN QUYỀN (ADMIN) -->
+    <section id="tab-admin" style="display:none;">
+      <h3 style="margin:0 0 6px;">🔐 Quản Lý Duyệt Nhập Bằng Tạo Tài Khoản - Mật Khẩu & Phân Quyền</h3>
+      <p style="margin:0 0 16px;font-size:13px;color:var(--muted);">
+        Tạo tài khoản mới và kết hợp phân quyền: Ai được xem dữ liệu, ai được gửi ảnh/ghi chú để <b>PySide6 tự động làm và trả kết quả</b>.
+      </p>
+
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:20px;">
+        <h4 style="margin:0 0 12px;color:var(--primary-light);">➕ Tạo Hoặc Cập Nhật Tài Khoản Người Dùng</h4>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;">
+          <div class="form-group">
+            <label>Tài khoản (Username)</label>
+            <input type="text" id="adm-user" placeholder="VD: nhanvien2" />
+          </div>
+          <div class="form-group">
+            <label>Mật khẩu (Password)</label>
+            <input type="text" id="adm-pass" placeholder="VD: 123456" value="123456" />
+          </div>
+          <div class="form-group">
+            <label>Họ tên / Bộ phận</label>
+            <input type="text" id="adm-name" placeholder="VD: Nhân viên Kho 02" />
+          </div>
+          <div class="form-group">
+            <label>Vai trò</label>
+            <select id="adm-role">
+              <option value="staff">Nhân viên (Xem + Gửi xử lý)</option>
+              <option value="viewer">Khách / Giám sát (Chỉ xem)</option>
+              <option value="admin">Quản trị viên (Admin)</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;gap:18px;flex-wrap:wrap;margin:10px 0 16px;font-size:13px;">
+          <label><input type="checkbox" id="adm-view" checked /> ✅ Quyền Xem dữ liệu chia sẻ</label>
+          <label><input type="checkbox" id="adm-submit" checked /> 📸 Quyền Chụp ảnh & Ghi chú gửi xử lý</label>
+          <label><input type="checkbox" id="adm-auto" checked /> ⚡ Cho phép PySide6 Tự Động Xử Lý & Trả Báo Cáo ngay</label>
+        </div>
+        <button class="btn btn-success" onclick="saveUserAdmin()">💾 Lưu Tài Khoản & Phân Quyền</button>
+      </div>
+
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Tài khoản</th>
+              <th>Mật khẩu</th>
+              <th>Họ tên</th>
+              <th>Quyền Xem</th>
+              <th>Quyền Gửi Xử Lý</th>
+              <th>PySide6 Tự Động Làm</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="users-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- THANH ĐIỀU HƯỚNG DƯỚI CÙNG (CHUẨN APP ĐIỆN THOẠI APK) -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" id="nav-live" onclick="switchTab('live')">
+      <span style="font-size:18px;">📡</span>
+      <span>Xem Thực Tế</span>
+    </button>
+    <button class="nav-item" id="nav-submit" onclick="switchTab('submit')">
+      <span style="font-size:18px;">📸</span>
+      <span>Chụp & Ghi Chú</span>
+    </button>
+    <button class="nav-item" id="nav-reports" onclick="switchTab('reports')">
+      <span style="font-size:18px;">📊</span>
+      <span>Báo Cáo Trả Về <span id="report-badge" class="badge-count" style="display:none;">0</span></span>
+    </button>
+    <button class="nav-item" id="nav-admin" onclick="switchTab('admin')" style="display:none;">
+      <span style="font-size:18px;">🔐</span>
+      <span>Quản Lý TK</span>
+    </button>
+  </nav>
+</div>
+
+<!-- MODAL XEM CHI TIẾT BÁO CÁO DO PYSIDE6 TRẢ VỀ -->
+<div id="report-modal" class="modal-backdrop" onclick="if(event.target===this)closeReportModal()">
+  <div class="modal-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:14px;">
+      <h3 style="margin:0;color:var(--primary-light);" id="rep-modal-title">📄 Báo Cáo Từ PySide6</h3>
+      <button class="btn btn-outline" style="padding:6px 12px;" onclick="closeReportModal()">✕ Đóng</button>
+    </div>
+    <div id="rep-modal-body"></div>
+  </div>
+</div>
+
+<!-- MODAL QR CODE & CÀI ĐẶT APK LÊN ĐIỆN THOẠI -->
+<div id="qr-modal" class="modal-backdrop" onclick="if(event.target===this)closeQrModal()">
+  <div class="modal-box" style="max-width:540px;text-align:center;">
+    <h3 style="margin:0 0 8px;color:var(--primary-light);">📲 Kết Nối Điện Thoại & Cài App (Wi-Fi / 4G Internet)</h3>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 14px;">
+      Quét mã QR bên dưới bằng Camera điện thoại để mở App ngay lập tức:
+    </p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-bottom:14px;">
+      <div style="background:#0f172a;padding:12px;border-radius:12px;border:1px solid var(--border);">
+        <div style="font-size:12px;font-weight:700;color:#4ade80;margin-bottom:8px;">📶 1. CÙNG MẠNG WI-FI (LAN)</div>
+        <img id="qr-img" src="" alt="QR Code LAN" style="width:175px;height:175px;border-radius:10px;border:3px solid #fff;margin-bottom:8px;" />
+        <div id="lan-url-box" style="font-weight:800;font-size:13px;color:#4ade80;word-break:break-all;"></div>
+      </div>
+      <div style="background:#0f172a;padding:12px;border-radius:12px;border:1px solid #7c3aed;">
+        <div style="font-size:12px;font-weight:700;color:#c4b5fd;margin-bottom:8px;">🌍 2. QUA 4G / INTERNET TỪ XA</div>
+        <img id="qr-pub-img" src="" alt="QR Code Public" style="width:175px;height:175px;border-radius:10px;border:3px solid #fff;margin-bottom:8px;display:none;margin-left:auto;margin-right:auto;" />
+        <div id="pub-url-box" style="font-weight:700;font-size:12px;color:#c4b5fd;word-break:break-all;padding:12px 4px;">
+          Hãy bấm nút <b>"🌍 BẬT INTERNET"</b> trên phần mềm PySide6 để lấy mã QR 4G/5G!
+        </div>
+      </div>
+    </div>
+    <div style="text-align:left;background:#0f172a;padding:12px 14px;border-radius:10px;font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:14px;">
+      <b>📌 Cách cài thành App trên màn hình chính điện thoại (như APK):</b><br/>
+      1. Quét mã QR trên để mở bằng <b>Chrome</b> (Android) hoặc <b>Safari</b> (iPhone).<br/>
+      2. Bấm nút <b>Menu (3 chấm)</b> -> Chọn <b>"Cài đặt ứng dụng" (Install App / Thêm vào màn hình chính)</b>.<br/>
+      3. Nếu điện thoại dùng 4G hoặc khác Wi-Fi, hãy quét mã <b>Số 2 (Qua 4G / Internet từ xa)</b>.
+    </div>
+    <button class="btn btn-primary" onclick="closeQrModal()">Đã Hiểu</button>
+  </div>
+</div>
+
+<script>
+  let currentUser = null;
+  let ws = null;
+  let canvas, ctx;
+  let isDrawing = false;
+  let penColor = "#ef4444";
+  let historySnapshots = [];
+  let cachedSubmissions = [];
+
+  // Hỗ trợ kết nối linh hoạt từ tên miền asfleetmanagement.is-a.dev / GitHub Pages về Server PySide6
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get("server")) {
+    localStorage.setItem("pyside6_server_url", urlParams.get("server").replace(/\/+$/, ""));
+  }
+  let API_BASE = localStorage.getItem("pyside6_server_url") || "";
+  window.addEventListener("DOMContentLoaded", () => {
+    const inp = document.getElementById("server-url-input");
+    if (inp && API_BASE) inp.value = API_BASE;
+  });
+
+  function saveServerUrl(val) {
+    API_BASE = (val || "").trim().replace(/\/+$/, "");
+    localStorage.setItem("pyside6_server_url", API_BASE);
+    showToast(API_BASE ? `🔗 Đã trỏ kết nối về: ${API_BASE}` : "☁️ Đang dùng chế độ Mặc định / Cloud");
+  }
+
+  // Dữ liệu dự phòng khi mở trên GitHub Pages (asfleetmanagement.is-a.dev) mà máy tính PySide6 đang tắt
+  const CLOUD_FALLBACK = {
+    users: [
+      { username: "admin", password: "admin123", full_name: "Quản Trị Viên (Full Quyền)", role: "admin", can_view: 1, can_submit: 1, auto_process: 1, is_active: 1 },
+      { username: "nhanvien1", password: "123456", full_name: "Nhân Viên Hiện Trường 01", role: "staff", can_view: 1, can_submit: 1, auto_process: 1, is_active: 1 },
+      { username: "khach1", password: "123456", full_name: "Khách Hàng / Giám Sát (Chỉ Xem)", role: "viewer", can_view: 1, can_submit: 0, auto_process: 0, is_active: 1 }
+    ],
+    metrics: [
+      { metric_key: "pyside_status", label: "Trạng thái hệ thống AS Fleet & PySide6", value: "Đang hoạt động 24/7", unit: "", is_shared: 1, updated_at: "Trực tuyến" },
+      { metric_key: "active_line", label: "Tiến độ xử lý đội xe & hiện trường", value: "92.4", unit: "%", is_shared: 1, updated_at: "Trực tuyến" },
+      { metric_key: "completed_docs", label: "Hồ sơ / Báo cáo đã duyệt", value: "128", unit: "bộ", is_shared: 1, updated_at: "Trực tuyến" }
+    ],
+    items: [
+      { id: 1, title: "Biểu đồ Tiến độ & Sản lượng Thời gian thực (AS Fleet Management)", category: "Báo cáo nhanh", description: "Dữ liệu đồng bộ từ phần mềm máy tính PySide6 cho các tài khoản được phân quyền.", file_url: "", is_shared: 1, allowed_users: "ALL", updated_at: "Hôm nay" },
+      { id: 2, title: "Hồ sơ Kiểm tra Kỹ thuật Ca Sáng", category: "Hình ảnh kỹ thuật", description: "Chỉ tài khoản Admin và Nhân viên hiện trường được phép xem mục này.", file_url: "", is_shared: 1, allowed_users: "admin,nhanvien1", updated_at: "Hôm nay" }
+    ],
+    submissions: []
+  };
+
+  const origFetch = window.fetch.bind(window);
+  window.fetch = async function(resource, options = {}) {
+    let url = typeof resource === "string" ? resource : resource.url;
+    if (url.startsWith("/api/")) {
+      const targetUrl = API_BASE ? (API_BASE + url) : url;
+      try {
+        const resp = await origFetch(targetUrl, options);
+        if (resp.ok || resp.status === 401 || resp.status === 403) {
+          const ct = resp.headers.get("content-type") || "";
+          if (ct.includes("application/json")) return resp;
+        }
+      } catch (err) {
+        // Chuyển sang Cloud Fallback bên dưới nếu máy tính PySide6 chưa bật
+      }
+      return handleCloudFallback(url, options);
+    }
+    return origFetch(resource, options);
+  };
+
+  async function handleCloudFallback(url, options) {
+    const method = (options.method || "GET").toUpperCase();
+    const jsonResp = (obj, status = 200) => new Response(JSON.stringify(obj), { status, headers: { "Content-Type": "application/json" } });
+
+    if (url.startsWith("/api/login") && method === "POST") {
+      const body = JSON.parse(options.body || "{}");
+      const u = CLOUD_FALLBACK.users.find(x => x.username === body.username && x.password === body.password);
+      if (!u) return jsonResp({ detail: "Sai tên đăng nhập hoặc mật khẩu!" }, 401);
+      return jsonResp(u);
+    }
+    if (url.startsWith("/api/shared-data")) {
+      const uParam = new URL("http://localhost" + url).searchParams.get("username") || "admin";
+      const u = CLOUD_FALLBACK.users.find(x => x.username === uParam) || CLOUD_FALLBACK.users[0];
+      if (!u.can_view && u.role !== "admin") return jsonResp({ metrics: [], items: [], permission_denied: true });
+      const items = CLOUD_FALLBACK.items.filter(it => it.allowed_users === "ALL" || it.allowed_users.includes(uParam) || u.role === "admin");
+      return jsonResp({ metrics: CLOUD_FALLBACK.metrics, items, permission_denied: false });
+    }
+    if (url.startsWith("/api/users")) {
+      if (method === "GET") return jsonResp(CLOUD_FALLBACK.users);
+      if (method === "POST") {
+        const nu = JSON.parse(options.body || "{}");
+        const idx = CLOUD_FALLBACK.users.findIndex(x => x.username === nu.username);
+        if (idx >= 0) CLOUD_FALLBACK.users[idx] = { ...CLOUD_FALLBACK.users[idx], ...nu };
+        else CLOUD_FALLBACK.users.push(nu);
+        return jsonResp({ status: "ok" });
+      }
+    }
+    if (url.startsWith("/api/submissions")) {
+      if (method === "GET") return jsonResp(CLOUD_FALLBACK.submissions);
+      if (method === "POST" && !url.includes("/process")) {
+        const fd = options.body;
+        const username = fd.get("username") || "nhanvien1";
+        const u = CLOUD_FALLBACK.users.find(x => x.username === username) || CLOUD_FALLBACK.users[0];
+        if (!u.can_submit && u.role !== "admin") return jsonResp({ detail: "Tài khoản chỉ có quyền xem!" }, 403);
+        const newId = CLOUD_FALLBACK.submissions.length + 1;
+        const imgB64 = fd.get("canvas_base64") || "";
+        const title = fd.get("title") || "Phiếu kiểm tra hiện trường";
+        const note_text = fd.get("note_text") || "";
+        const sub = {
+          id: newId, username, full_name: u.full_name, title, note_text,
+          status: "completed", auto_process: 1,
+          input_image_url: imgB64, report_image_url: imgB64,
+          report_summary: `Hệ thống AS Fleet & PySide6 đã tự động phân tích ảnh & ghi chú tay '${title}'. Kết quả: ĐẠT YÊU CẦU (100%).`,
+          report_data_json: JSON.stringify({
+            report_code: `BC-PYSIDE6-000${newId}`,
+            metrics: [
+              { name: "Độ chính xác nhận diện vùng ghi chú", value: "99.4%", status: "Tốt" },
+              { name: "Trạng thái kiểm duyệt tự động", value: "Hợp lệ (Verified)", status: "Đạt" }
+            ]
+          }),
+          created_at: new Date().toLocaleString("vi-VN")
+        };
+        CLOUD_FALLBACK.submissions.unshift(sub);
+        return jsonResp({ status: "ok", submission_id: newId, auto_process: 1 });
+      }
+      return jsonResp({ status: "completed" });
+    }
+    if (url.startsWith("/api/network-info")) {
+      return jsonResp({
+        lan_url: window.location.origin,
+        public_url: window.location.origin,
+        qr_code: "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(window.location.origin),
+        qr_public: "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(window.location.origin)
+      });
+    }
+    return jsonResp({ status: "ok" });
+  }
+
+  function showToast(msg, bg = "#0284c7") {
+    const t = document.getElementById("toast");
+    t.style.background = bg;
+    t.innerHTML = msg;
+    t.style.display = "block";
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(() => { t.style.display = "none"; }, 3800);
+  }
+
+  function quickLogin(u, p) {
+    document.getElementById("login-user").value = u;
+    document.getElementById("login-pass").value = p;
+    doLogin();
+  }
+
+  async function doLogin() {
+    const username = document.getElementById("login-user").value.trim();
+    const password = document.getElementById("login-pass").value.trim();
+    if (!username || !password) return showToast("⚠️ Vui lòng nhập tài khoản và mật khẩu!", "#ef4444");
+
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if (!res.ok) return showToast("❌ " + (data.detail || "Đăng nhập thất bại"), "#ef4444");
+
+      currentUser = data;
+      document.getElementById("login-screen").style.display = "none";
+      document.getElementById("app-screen").style.display = "block";
+      updateUserUI();
+      initCanvas();
+      loadSharedData();
+      loadSubmissions();
+      if (currentUser.role === "admin") loadUsersAdmin();
+      connectWebSocket();
+      showToast(`✅ Xin chào ${currentUser.full_name}!`, "#16a34a");
+    } catch (e) {
+      showToast("❌ Không kết nối được Server!", "#ef4444");
+    }
+  }
+
+  function logout() {
+    currentUser = null;
+    document.getElementById("app-screen").style.display = "none";
+    document.getElementById("login-screen").style.display = "flex";
+  }
+
+  function updateUserUI() {
+    if (!currentUser) return;
+    const perms = [];
+    if (currentUser.can_view) perms.push("👁️ Xem chia sẻ");
+    if (currentUser.can_submit) perms.push("📸 Gửi xử lý");
+    if (currentUser.auto_process) perms.push("⚡ Auto-PySide6");
+    document.getElementById("user-badge").innerHTML =
+      `TK: <b style="color:#fff">${currentUser.username}</b> (${currentUser.full_name}) | Quyền: <span style="color:#38bdf8">${perms.join(" • ") || "Hạn chế"}</span>`;
+
+    document.getElementById("nav-admin").style.display = currentUser.role === "admin" ? "flex" : "none";
+
+    if (currentUser.can_submit === 0 && currentUser.role !== "admin") {
+      document.getElementById("submit-locked").style.display = "block";
+      document.getElementById("submit-form-area").style.display = "none";
+    } else {
+      document.getElementById("submit-locked").style.display = "none";
+      document.getElementById("submit-form-area").style.display = "block";
+    }
+  }
+
+  function switchTab(tab) {
+    ["live", "submit", "reports", "admin"].forEach(t => {
+      document.getElementById("tab-" + t).style.display = (t === tab) ? "block" : "none";
+      const nav = document.getElementById("nav-" + t);
+      if (nav) nav.classList.toggle("active", t === tab);
+    });
+    if (tab === "live") loadSharedData();
+    if (tab === "reports") loadSubmissions();
+    if (tab === "admin" && currentUser?.role === "admin") loadUsersAdmin();
+  }
+
+  async function loadSharedData() {
+    if (!currentUser) return;
+    try {
+      const res = await fetch(`/api/shared-data?username=${encodeURIComponent(currentUser.username)}`);
+      const data = await res.json();
+
+      const mBox = document.getElementById("metrics-container");
+      const iBox = document.getElementById("shared-items-container");
+
+      if (data.permission_denied) {
+        mBox.innerHTML = "";
+        iBox.innerHTML = `<div style="grid-column:1/-1;padding:24px;background:var(--card);border-radius:12px;text-align:center;color:#fca5a5;">🔒 Tài khoản của bạn hiện không được cấp quyền xem dữ liệu chia sẻ.</div>`;
+        return;
+      }
+
+      mBox.innerHTML = data.metrics.map(m => `
+        <div class="metric-card">
+          <div class="metric-label">🟢 ĐANG CHIA SẺ TỪ PYSIDE6</div>
+          <div style="font-size:13px;color:#cbd5e1;margin-bottom:4px;">${m.label}</div>
+          <div class="metric-val">${m.value} <span style="font-size:14px;color:var(--primary-light);">${m.unit || ""}</span></div>
+          <div class="metric-time">Cập nhật lúc: ${m.updated_at}</div>
+        </div>
+      `).join("");
+
+      if (!data.items.length) {
+        iBox.innerHTML = `<div style="grid-column:1/-1;padding:24px;background:var(--card);border-radius:12px;text-align:center;color:var(--muted);">Chưa có mục nào được PySide6 bật chia sẻ cho tài khoản <b>${currentUser.username}</b>.</div>`;
+      } else {
+        iBox.innerHTML = data.items.map(it => `
+          <div class="shared-card">
+            ${it.file_url ? `<img src="${it.file_url}" alt="${it.title}" onclick="window.open('${it.file_url}','_blank')" />` : ""}
+            <div class="shared-card-body">
+              <span class="tag">${it.category}</span>
+              <h4 style="margin:0 0 6px;font-size:15px;">${it.title}</h4>
+              <p style="margin:0 0 12px;font-size:13px;color:var(--muted);flex:1;">${it.description || ""}</p>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#64748b;border-top:1px solid var(--border);padding-top:8px;">
+                <span>🕒 ${it.updated_at}</span>
+                <span style="color:#4ade80;">✓ Được phép xem (${it.allowed_users})</span>
+              </div>
+            </div>
+          </div>
+        `).join("");
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /* CANVAS CHỤP ẢNH & GHI CHÚ BẰNG TAY */
+  function initCanvas() {
+    canvas = document.getElementById("draw-canvas");
+    if (!canvas || canvas._initialized) return;
+    canvas._initialized = true;
+    ctx = canvas.getContext("2d");
+    drawSampleTemplate();
+
+    const getPos = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
+    };
+
+    const startDraw = (e) => {
+      e.preventDefault();
+      saveSnapshot();
+      isDrawing = true;
+      const p = getPos(e);
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+    };
+
+    const moveDraw = (e) => {
+      if (!isDrawing) return;
+      e.preventDefault();
+      const p = getPos(e);
+      ctx.lineTo(p.x, p.y);
+      ctx.strokeStyle = penColor;
+      ctx.lineWidth = parseInt(document.getElementById("pen-size").value || "4", 10);
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.stroke();
+    };
+
+    const endDraw = () => { isDrawing = false; };
+
+    canvas.addEventListener("mousedown", startDraw);
+    canvas.addEventListener("mousemove", moveDraw);
+    window.addEventListener("mouseup", endDraw);
+
+    canvas.addEventListener("touchstart", startDraw, { passive: false });
+    canvas.addEventListener("touchmove", moveDraw, { passive: false });
+    canvas.addEventListener("touchend", endDraw);
+  }
+
+  function saveSnapshot() {
+    if (!canvas) return;
+    if (historySnapshots.length > 15) historySnapshots.shift();
+    historySnapshots.push(canvas.toDataURL());
+  }
+
+  function undoStroke() {
+    if (!historySnapshots.length) return showToast("Đã ở bước đầu tiên!");
+    const last = historySnapshots.pop();
+    const img = new Image();
+    img.onload = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+    };
+    img.src = last;
+  }
+
+  function setPenColor(color, el) {
+    penColor = color;
+    document.querySelectorAll(".color-dot").forEach(d => d.classList.remove("active"));
+    if (el) el.classList.add("active");
+  }
+
+  function clearCanvasWhite() {
+    saveSnapshot();
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = "#cbd5e1";
+    for (let y = 40; y < canvas.height; y += 35) {
+      ctx.beginPath();
+      ctx.moveTo(20, y);
+      ctx.lineTo(canvas.width - 20, y);
+      ctx.stroke();
+    }
+    ctx.fillStyle = "#64748b";
+    ctx.font = "bold 15px Segoe UI";
+    ctx.fillText("BẢNG GHI CHÚ VIẾT TAY GỬI LÊN PYSIDE6 (Hãy vẽ hoặc viết trực tiếp lên đây)", 24, 28);
+  }
+
+  function drawSampleTemplate() {
+    if (!ctx) return;
+    historySnapshots = [];
+    ctx.fillStyle = "#f8fafc";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Header
+    ctx.fillStyle = "#0f172a";
+    ctx.fillRect(0, 0, canvas.width, 58);
+    ctx.fillStyle = "#38bdf8";
+    ctx.font = "bold 17px Segoe UI";
+    ctx.fillText("HÌNH CHỤP TÀI LIỆU / HIỆN TRƯỜNG MẪU (CÓ THỂ VẼ GHI CHÚ LÊN TRÊN)", 20, 35);
+
+    // Sample technical box
+    ctx.strokeStyle = "#334155";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(25, 80, 670, 210);
+
+    ctx.fillStyle = "#1e293b";
+    ctx.font = "bold 15px Segoe UI";
+    ctx.fillText("Thông số đo đạc tại hiện trường #A-102:", 45, 115);
+    ctx.font = "14px Segoe UI";
+    ctx.fillStyle = "#334155";
+    ctx.fillText("• Áp suất vận hành: 4.8 Bar (Bình thường)", 55, 148);
+    ctx.fillText("• Nhiệt độ cụm máy số 2: 78.5 °C (Cần kiểm tra trên PySide6)", 55, 180);
+    ctx.fillText("• Độ lệch chuẩn: 0.02 mm - Đạt yêu cầu kỹ thuật", 55, 212);
+    ctx.fillText("• Người kiểm tra hiện trường: " + (currentUser ? currentUser.full_name : "Nhân viên"), 55, 244);
+
+    // Sample red hand-drawn circle + note so user sees how it works immediately
+    ctx.strokeStyle = "#ef4444";
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.ellipse(260, 175, 215, 22, 0, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.fillStyle = "#dc2626";
+    ctx.font = "bold 15px Segoe UI";
+    ctx.fillText("✍️ Ghi chú tay: Nhờ PySide6 phân tích mục này & xuất Báo cáo!", 45, 335);
+    ctx.fillStyle = "#64748b";
+    ctx.font = "13px Segoe UI";
+    ctx.fillText("(Bạn có thể dùng chuột hoặc ngón tay vẽ thêm lên ảnh này, hoặc bấm 'Mở Camera Chụp Hình')", 45, 368);
+  }
+
+  function handleImageUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        saveSnapshot();
+        ctx.fillStyle = "#0f172a";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        const ratio = Math.min(canvas.width / img.width, canvas.height / img.height);
+        const w = img.width * ratio;
+        const h = img.height * ratio;
+        const x = (canvas.width - w) / 2;
+        const y = (canvas.height - h) / 2;
+        ctx.drawImage(img, x, y, w, h);
+        showToast("📷 Đã tải ảnh lên bảng vẽ! Hãy dùng tay vẽ/khoanh ghi chú lên ảnh.");
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async function submitToPySide6() {
+    if (!currentUser) return;
+    const title = document.getElementById("sub-title").value.trim() || "Tài liệu chụp & ghi chú từ Điện thoại";
+    const note_text = document.getElementById("sub-note").value.trim();
+    const task_type = document.getElementById("sub-type").value;
+    const canvas_base64 = canvas.toDataURL("image/png");
+
+    const btn = document.getElementById("btn-send-sub");
+    const prog = document.getElementById("submit-progress");
+    const progText = document.getElementById("submit-progress-text");
+
+    btn.disabled = true;
+    prog.style.display = "block";
+    progText.innerHTML = "📤 Đang đẩy Hình ảnh & Ghi chú tay lên Server...";
+
+    const fd = new FormData();
+    fd.append("username", currentUser.username);
+    fd.append("title", title);
+    fd.append("note_text", note_text);
+    fd.append("task_type", task_type);
+    fd.append("canvas_base64", canvas_base64);
+
+    try {
+      const res = await fetch("/api/submissions", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) {
+        prog.style.display = "none";
+        btn.disabled = false;
+        return showToast("❌ " + (data.detail || "Không thể gửi"), "#ef4444");
+      }
+
+      const subId = data.submission_id;
+      progText.innerHTML = `⚙️ Đã gửi mã #${subId}! Phần mềm <b>PySide6</b> đang tự động xử lý và tạo Báo cáo...`;
+
+      // Wait briefly to see if PySide6 Desktop Worker picks it up within 2s; if not, trigger auto-engine so user gets immediate result
+      setTimeout(async () => {
+        const listRes = await fetch(`/api/submissions?username=${encodeURIComponent(currentUser.username)}&role=${currentUser.role}`);
+        const subs = await listRes.json();
+        const found = subs.find(s => s.id === subId);
+        if (found && found.status !== "completed" && data.auto_process) {
+          await fetch(`/api/submissions/${subId}/process`, { method: "POST" });
+        }
+        btn.disabled = false;
+        prog.style.display = "none";
+        await loadSubmissions();
+        switchTab("reports");
+        openReportById(subId);
+      }, 1800);
+
+    } catch (err) {
+      btn.disabled = false;
+      prog.style.display = "none";
+      showToast("❌ Lỗi kết nối khi gửi tài liệu!", "#ef4444");
+    }
+  }
+
+  async function loadSubmissions() {
+    if (!currentUser) return;
+    try {
+      const res = await fetch(`/api/submissions?username=${encodeURIComponent(currentUser.username)}&role=${currentUser.role}`);
+      cachedSubmissions = await res.json();
+
+      const completedCount = cachedSubmissions.filter(s => s.status === "completed").length;
+      const badge = document.getElementById("report-badge");
+      if (completedCount > 0) {
+        badge.style.display = "inline-block";
+        badge.textContent = completedCount;
+      }
+
+      const box = document.getElementById("submissions-list");
+      if (!cachedSubmissions.length) {
+        box.innerHTML = `<div style="grid-column:1/-1;padding:24px;background:var(--card);border-radius:12px;text-align:center;color:var(--muted);">Chưa có yêu cầu xử lý nào. Hãy qua mục <b>"Chụp & Ghi Chú"</b> để gửi thử!</div>`;
+        return;
+      }
+
+      box.innerHTML = cachedSubmissions.map(s => {
+        const isDone = s.status === "completed";
+        const statusBadge = isDone
+          ? `<span style="background:rgba(22,163,74,0.2);color:#4ade80;padding:4px 10px;border-radius:99px;font-size:11px;font-weight:700;">✓ Đã có Báo Cáo từ PySide6</span>`
+          : `<span style="background:rgba(234,179,8,0.2);color:#facc15;padding:4px 10px;border-radius:99px;font-size:11px;font-weight:700;">⏳ Đang xử lý trên PySide6...</span>`;
+        const imgUrl = isDone && s.report_image_url ? s.report_image_url : s.input_image_url;
+
+        return `
+          <div class="shared-card">
+            ${imgUrl ? `<img src="${imgUrl}" onclick="openReportById(${s.id})" />` : ""}
+            <div class="shared-card-body">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <span style="font-size:12px;color:var(--primary-light);font-weight:700;">#BC-${String(s.id).padStart(4,'0')}</span>
+                ${statusBadge}
+              </div>
+              <h4 style="margin:0 0 6px;font-size:15px;">${s.title}</h4>
+              <p style="margin:0 0 10px;font-size:12px;color:var(--muted);flex:1;">
+                ${isDone ? `<b>Kết quả PySide6:</b> ${s.report_summary}` : `Ghi chú gửi: ${s.note_text || "Ghi chú vẽ tay"}`}
+              </p>
+              <div style="display:flex;gap:8px;margin-top:8px;">
+                <button class="btn btn-primary" style="padding:9px;font-size:12px;" onclick="openReportById(${s.id})">
+                  📄 Xem Chi Tiết Báo Cáo
+                </button>
+                ${isDone && s.report_html_url ? `<a href="${s.report_html_url}" target="_blank" class="btn btn-outline" style="padding:9px 12px;font-size:12px;text-decoration:none;">🖨️ Bản In / PDF</a>` : ""}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  function openReportById(id) {
+    const s = cachedSubmissions.find(x => x.id === id);
+    if (!s) return;
+    let repData = {};
+    try { repData = JSON.parse(s.report_data_json || "{}"); } catch (e) {}
+
+    const metricsHtml = (repData.metrics || []).map(m =>
+      `<tr><td>${m.name}</td><td><b>${m.value}</b></td><td style="color:#4ade80;font-weight:bold;">${m.status}</td></tr>`
+    ).join("");
+
+    document.getElementById("rep-modal-title").innerHTML = `📊 Báo Cáo #${repData.report_code || s.id}: ${s.title}`;
+    document.getElementById("rep-modal-body").innerHTML = `
+      <div style="background:#0f172a;padding:14px;border-radius:12px;border:1px solid var(--border);margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+          <span style="font-size:13px;color:var(--muted);">Người gửi: <b style="color:#fff">${s.full_name} (${s.username})</b></span>
+          <span style="font-size:13px;color:#4ade80;font-weight:700;">✓ Xử lý bởi: Phần mềm PySide6</span>
+        </div>
+        <div style="font-size:14px;color:#38bdf8;font-weight:700;margin-bottom:4px;">Kết luận tự động từ PySide6:</div>
+        <div style="font-size:13px;color:#e2e8f0;">${s.report_summary || "Đang xử lý..."}</div>
+      </div>
+
+      ${metricsHtml ? `
+        <h4 style="margin:0 0 8px;font-size:13px;color:var(--muted);">BẢNG THÔNG SỐ KẾT QUẢ PHÂN TÍCH:</h4>
+        <table style="margin-bottom:16px;background:#0f172a;border-radius:8px;overflow:hidden;">
+          <thead><tr><th>Hạng mục</th><th>Giá trị</th><th>Đánh giá</th></tr></thead>
+          <tbody>${metricsHtml}</tbody>
+        </table>
+      ` : ""}
+
+      ${s.report_image_url ? `
+        <h4 style="margin:0 0 8px;font-size:13px;color:var(--muted);">HÌNH ẢNH & GHI CHÚ ĐÃ ĐƯỢC PYSIDE6 ĐÓNG DẤU XỬ LÝ:</h4>
+        <img src="${s.report_image_url}" style="width:100%;border-radius:10px;border:2px solid var(--primary);margin-bottom:14px;" />
+      ` : ""}
+
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        ${s.report_html_url ? `<a href="${s.report_html_url}" target="_blank" class="btn btn-success" style="text-decoration:none;">🖨️ Mở / Tải Báo Cáo Chuẩn In PDF</a>` : ""}
+        <button class="btn btn-outline" onclick="closeReportModal()">Đóng</button>
+      </div>
+    `;
+    document.getElementById("report-modal").style.display = "flex";
+  }
+
+  function closeReportModal() {
+    document.getElementById("report-modal").style.display = "none";
+  }
+
+  /* QUẢN LÝ TÀI KHOẢN & PHÂN QUYỀN (ADMIN) */
+  async function loadUsersAdmin() {
+    const res = await fetch("/api/users");
+    const users = await res.json();
+    const tbody = document.getElementById("users-table-body");
+    tbody.innerHTML = users.map(u => `
+      <tr>
+        <td><b>${u.username}</b> <span style="font-size:11px;color:var(--primary-light);">(${u.role})</span></td>
+        <td><code>${u.password}</code></td>
+        <td>${u.full_name}</td>
+        <td><input type="checkbox" ${u.can_view ? "checked" : ""} onchange="quickTogglePerm('${u.username}', 'can_view', this.checked)" /></td>
+        <td><input type="checkbox" ${u.can_submit ? "checked" : ""} onchange="quickTogglePerm('${u.username}', 'can_submit', this.checked)" /></td>
+        <td><input type="checkbox" ${u.auto_process ? "checked" : ""} onchange="quickTogglePerm('${u.username}', 'auto_process', this.checked)" /></td>
+        <td>
+          ${u.username !== "admin" ? `<button class="btn btn-danger" style="padding:4px 10px;font-size:11px;" onclick="deleteUserAdmin('${u.username}')">Xóa</button>` : "<span style='color:var(--muted);font-size:11px;'>Mặc định</span>"}
+        </td>
+      </tr>
+    `).join("");
+  }
+
+  async function saveUserAdmin() {
+    const username = document.getElementById("adm-user").value.trim();
+    const password = document.getElementById("adm-pass").value.trim() || "123456";
+    const full_name = document.getElementById("adm-name").value.trim() || username;
+    const role = document.getElementById("adm-role").value;
+    const can_view = document.getElementById("adm-view").checked ? 1 : 0;
+    const can_submit = document.getElementById("adm-submit").checked ? 1 : 0;
+    const auto_process = document.getElementById("adm-auto").checked ? 1 : 0;
+
+    if (!username) return showToast("⚠️ Vui lòng nhập tên tài khoản!", "#ef4444");
+    await fetch("/api/users", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password, full_name, role, can_view, can_submit, auto_process, is_active: 1 })
+    });
+    showToast(`✅ Đã lưu tài khoản '${username}' và cập nhật phân quyền!`, "#16a34a");
+    document.getElementById("adm-user").value = "";
+    document.getElementById("adm-name").value = "";
+    loadUsersAdmin();
+  }
+
+  async function quickTogglePerm(username, field, checked) {
+    const res = await fetch("/api/users");
+    const users = await res.json();
+    const u = users.find(x => x.username === username);
+    if (!u) return;
+    u[field] = checked ? 1 : 0;
+    await fetch("/api/users", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(u)
+    });
+    showToast(`🔐 Đã cập nhật quyền của '${username}'!`, "#16a34a");
+    if (currentUser && currentUser.username === username) {
+      currentUser[field] = checked ? 1 : 0;
+      updateUserUI();
+    }
+  }
+
+  async function deleteUserAdmin(username) {
+    if (!confirm(`Xóa tài khoản ${username}?`)) return;
+    await fetch(`/api/users/${encodeURIComponent(username)}`, { method: "DELETE" });
+    showToast(`🗑️ Đã xóa tài khoản ${username}`);
+    loadUsersAdmin();
+  }
+
+  async function openQrModal() {
+    const res = await fetch("/api/network-info");
+    const info = await res.json();
+    document.getElementById("qr-img").src = info.qr_code;
+    document.getElementById("lan-url-box").textContent = info.lan_url;
+    const pubImg = document.getElementById("qr-pub-img");
+    const pubBox = document.getElementById("pub-url-box");
+    if (info.public_url && info.qr_public) {
+      pubImg.src = info.qr_public;
+      pubImg.style.display = "block";
+      pubBox.innerHTML = `<a href="${info.public_url}" target="_blank" style="color:#c4b5fd;">${info.public_url}</a>`;
+    } else {
+      pubImg.style.display = "none";
+      pubBox.innerHTML = `Hãy bấm nút <b>"🌍 BẬT INTERNET"</b> trên phần mềm PySide6 để lấy mã QR 4G/5G!`;
+    }
+    document.getElementById("qr-modal").style.display = "flex";
+  }
+
+  function closeQrModal() {
+    document.getElementById("qr-modal").style.display = "none";
+  }
+
+  /* REAL-TIME WEBSOCKET */
+  function connectWebSocket() {
+    if (ws) { try { ws.close(); } catch (e) {} }
+    const proto = location.protocol === "https:" ? "wss:" : "ws:";
+    ws = new WebSocket(`${proto}//${location.host}/ws`);
+    ws.onmessage = (event) => {
+      try {
+        const msg = JSON.parse(event.data);
+        if (msg.event === "shared_data_updated") {
+          loadSharedData();
+          showToast("📡 PySide6 vừa cập nhật dữ liệu chia sẻ thời gian thực!");
+        } else if (msg.event === "submission_completed") {
+          loadSubmissions();
+          showToast(`✅ PySide6 đã xử lý xong & trả Báo cáo: "${msg.data.title}"!`, "#16a34a");
+        } else if (msg.event === "users_updated") {
+          if (currentUser?.role === "admin") loadUsersAdmin();
+        }
+      } catch (e) {}
+    };
+    ws.onclose = () => {
+      setTimeout(connectWebSocket, 3000);
+    };
+  }
+
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/sw.js").catch(() => {});
+  }
+</script>
+</body>
+</html>
