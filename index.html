@@ -417,24 +417,230 @@
       <div id="shared-items-container" class="cards-grid"></div>
     </section>
 
-    <!-- TAB 2: CHỤP HÌNH & GHI CHÚ TAY GỬI LÊN PYSIDE6 XỬ LÝ -->
+    <!-- TAB 2: LẬP BÁO CÁO NGÀY ALLSEA MANAGEMENT & CHỤP HÌNH GỬI PYSIDE6 XỬ LÝ (HỖ TRỢ OFFLINE APK) -->
     <section id="tab-submit" style="display:none;">
       <div id="submit-locked" style="display:none;background:rgba(239,68,68,0.12);border:1px solid #ef4444;border-radius:14px;padding:24px;text-align:center;">
         <div style="font-size:40px;margin-bottom:10px;">🔒</div>
         <h3 style="margin:0 0 8px;color:#fca5a5;">Tài Khoản Của Bạn Chỉ Có Quyền Xem</h3>
         <p style="color:var(--muted);font-size:14px;max-width:480px;margin:0 auto;">
-          Quản trị viên (Admin) đã giới hạn tài khoản này ở chế độ <b>Chỉ Xem</b>. Vui lòng chuyển sang tài khoản <b>nhanvien1</b> hoặc <b>admin</b> (hoặc bật quyền trong trang Quản lý TK) để gửi hình ảnh & ghi chú cho PySide6 xử lý.
+          Quản trị viên (Admin) đã giới hạn tài khoản này ở chế độ <b>Chỉ Xem</b>. Vui lòng chuyển sang tài khoản <b>nhanvien1</b> hoặc <b>admin</b> để lập báo cáo & gửi về Python xử lý.
         </p>
       </div>
 
       <div id="submit-form-area">
-        <h3 style="margin:0 0 6px;">📸 Chụp Hình & Viết Ghi Chú Bằng Tay -> Gửi PySide6 Xử Lý</h3>
-        <p style="margin:0 0 16px;font-size:13px;color:var(--muted);">
-          Chụp ảnh tài liệu/hiện trường hoặc chọn ảnh -> Dùng ngón tay (hoặc chuột) khoanh vùng, viết ghi chú trực tiếp lên ảnh -> Gửi về <b>PySide6</b> tự động xử lý và trả lại <b>Báo cáo</b>.
-        </p>
+        <!-- THANH CHỌN LOẠI FORM BÁO CÁO (MỞ RỘNG THÊM CÁC BÁO CÁO KHÁC SAU NÀY) & TRẠNG THÁI OFFLINE APK -->
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;background:var(--card);padding:12px 16px;border-radius:12px;border:1px solid var(--border);">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <span style="font-size:13px;font-weight:700;color:var(--primary-light);">📑 Chọn Mẫu Form Báo Cáo:</span>
+            <select id="report-template-selector" onchange="switchReportTemplate(this.value)" style="width:auto;min-width:260px;font-weight:700;background:#090d16;border-color:var(--primary);">
+              <option value="allsea_daily">📄 Mẫu 1: Báo Cáo Ngày / Docking (ALLSEA MANAGEMENT JSC)</option>
+              <option value="canvas_note">✍️ Mẫu 2: Chụp Ảnh & Vẽ Khoanh Vùng Ghi Chú Tay</option>
+              <option value="future_form" disabled>➕ Mẫu 3: (Sẵn sàng thêm các Form Báo Cáo mới tiếp theo...)</option>
+            </select>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span id="net-status-badge" style="padding:5px 12px;border-radius:99px;font-size:12px;font-weight:700;background:rgba(22,163,74,0.2);color:#4ade80;border:1px solid rgba(74,222,128,0.4);">
+              🟢 Đang Online (Sẵn sàng gửi về Python)
+            </span>
+          </div>
+        </div>
 
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;">
-          <!-- Bước 1: Chọn ảnh hoặc chụp camera -->
+        <!-- KHUNG HÀNG ĐỢI OFFLINE (HIỆN KHI CÓ BÁO CÁO LƯU OFFLINE TRÊN ĐIỆN THOẠI APK) -->
+        <div id="offline-queue-banner" style="display:none;background:rgba(234,179,8,0.14);border:1.5px solid #eab308;border-radius:12px;padding:12px 16px;margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+            <div>
+              <div style="font-weight:800;color:#facc15;font-size:14px;">
+                📦 Có <span id="offline-count-num">0</span> Báo cáo đã lưu OFFLINE trong máy điện thoại (Chờ gửi về Python)
+              </div>
+              <div style="font-size:12px;color:#cbd5e1;margin-top:2px;">
+                Khi có mạng Wi-Fi/4G, hãy bấm nút bên phải để tự động đẩy toàn bộ về phần mềm Python xử lý.
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-success" style="padding:8px 14px;font-size:12px;" onclick="syncOfflineQueueNow()">
+                🚀 Gửi Tất Cả Báo Cáo Offline Về Python Ngay
+              </button>
+            </div>
+          </div>
+          <div id="offline-queue-items" style="margin-top:10px;display:flex;flex-direction:column;gap:6px;"></div>
+        </div>
+
+        <!-- ==================== MẪU 1: FORM BÁO CÁO NGÀY ALLSEA MANAGEMENT JSC ==================== -->
+        <div id="tpl-allsea-daily" style="background:#ffffff;color:#0f172a;border-radius:14px;padding:22px;border:2px solid #0284c7;box-shadow:0 10px 30px rgba(0,0,0,0.35);">
+          <!-- HEADER KHUNG LOGO GÓC TRÁI + Ở GIỮA "ALLSEA MANAGEMENT JSC" REPORT -->
+          <table style="width:100%;border-collapse:collapse;border:2px solid #000;margin-bottom:14px;background:#fff;">
+            <tr>
+              <td style="width:110px;border:1.5px solid #000;text-align:center;padding:8px;vertical-align:middle;">
+                <label style="cursor:pointer;display:block;" title="Bấm vào để đổi ảnh Logo nếu muốn">
+                  <img id="allsea-form-logo" src="/allsea_logo.png" onerror="this.src='allsea_logo.png'" alt="Allsea Logo" style="width:72px;height:72px;object-fit:contain;display:block;margin:0 auto;" />
+                  <span style="font-size:9px;color:#64748b;display:block;margin-top:2px;">(Đổi Logo)</span>
+                  <input type="file" accept="image/*" style="display:none;" onchange="changeLogoFile(event)" />
+                </label>
+              </td>
+              <td style="border:1.5px solid #000;text-align:center;padding:10px 14px;vertical-align:middle;">
+                <div style="font-size:17px;font-weight:900;color:#0f172a;letter-spacing:0.5px;">ALLSEA MANAGEMENT JSC</div>
+                <div style="font-size:13px;font-weight:700;color:#334155;margin-top:2px;">CÔNG TY CỔ PHẦN ALLSEA MANAGEMENT — REPORT</div>
+                <!-- PHẦN BÁO CÁO NGÀY: CHỌN HOẶC GHI BẰNG TAY, TỰ ĐỘNG ĐƯA VÀO FORM -->
+                <div style="margin-top:8px;display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;">
+                  <select id="quick-report-title-select" onchange="onSelectReportHeaderTitle(this.value)" style="width:auto;background:#f1f5f9;color:#0f172a;border:1px solid #94a3b8;padding:5px 10px;font-size:12px;font-weight:700;">
+                    <option value="BÁO CÁO NGÀY">Chọn nhanh: BÁO CÁO NGÀY</option>
+                    <option value="BÁO CÁO SỬA CHỮA LÊN ĐÀ (DOCKING REPORT)">Chọn nhanh: BÁO CÁO LÊN ĐÀ (DOCKING)</option>
+                    <option value="BÁO CÁO KỸ THUẬT ĐỘT XUẤT (OTHER REPORT)">Chọn nhanh: BÁO CÁO KHÁC (OTHER)</option>
+                  </select>
+                  <input type="text" id="allsea-report-header-title" value="BÁO CÁO NGÀY" placeholder="Hoặc gõ tay tiêu đề báo cáo..." style="width:280px;max-width:100%;background:#fffbeb;color:#0f172a;border:1.5px solid #0284c7;font-weight:800;font-size:14px;text-align:center;padding:6px 10px;" />
+                </div>
+              </td>
+            </tr>
+          </table>
+
+          <!-- KHUNG SHIP NAME (CHỌN DROP LIST HOẶC ĐIỀN TAY) | NGƯỜI BÁO CÁO (ĐIỀN TAY) | ITEMS (DROP LIST) -->
+          <table style="width:100%;border-collapse:collapse;border:1.5px solid #000;margin-bottom:14px;background:#fff;">
+            <tr>
+              <td style="width:50%;border:1px solid #000;padding:8px 10px;">
+                <div style="font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">SHIP NAME (Chọn Drop list hoặc gõ tay):</div>
+                <div style="display:flex;gap:6px;">
+                  <select id="ship-select-drop" onchange="if(this.value)document.getElementById('allsea-ship-name').value=this.value" style="width:135px;background:#f1f5f9;color:#0f172a;border:1px solid #94a3b8;padding:6px;font-size:12px;font-weight:700;">
+                    <option value="">-- Chọn tàu --</option>
+                    <option value="LS JUPITER" selected>LS JUPITER</option>
+                    <option value="LS MERCURY">LS MERCURY</option>
+                    <option value="LS NEPTUNE">LS NEPTUNE</option>
+                    <option value="LS URANUS">LS URANUS</option>
+                    <option value="LS VENUS">LS VENUS</option>
+                    <option value="GT EQUALITY">GT EQUALITY</option>
+                    <option value="GT PEACE">GT PEACE</option>
+                    <option value="GT VICTORY">GT VICTORY</option>
+                    <option value="GT WIN">GT WIN</option>
+                    <option value="MG 01">MG 01</option>
+                    <option value="MG 02">MG 02</option>
+                    <option value="MG 03">MG 03</option>
+                  </select>
+                  <input type="text" id="allsea-ship-name" value="LS JUPITER" placeholder="Hoặc tự gõ tên tàu..." style="flex:1;background:#fff;color:#0f172a;border:1px solid #64748b;font-weight:700;padding:6px 10px;" />
+                </div>
+              </td>
+              <td style="width:50%;border:1px solid #000;padding:8px 10px;">
+                <div style="font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">NGƯỜI BÁO CÁO / SUPERINTENDENT (Điền tay):</div>
+                <input type="text" id="allsea-reporter" value="Mr. XUÂN ANH" placeholder="Nhập tên người báo cáo..." style="width:100%;background:#fff;color:#0f172a;border:1px solid #64748b;font-weight:700;padding:6px 10px;" />
+              </td>
+            </tr>
+            <tr>
+              <td style="border:1px solid #000;padding:8px 10px;">
+                <div style="font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">ITEMS (Chọn Drop list hoặc ghi thêm):</div>
+                <div style="display:flex;gap:6px;">
+                  <select id="allsea-item-drop" onchange="onSelectItemType(this.value)" style="width:155px;background:#f1f5f9;color:#0f172a;border:1px solid #94a3b8;padding:6px;font-size:12px;font-weight:700;">
+                    <option value="DAILY REPORT" selected>DAILY REPORT</option>
+                    <option value="DOCKING REPORT">DOCKING REPORT</option>
+                    <option value="OTHER REPORT">OTHER REPORT</option>
+                  </select>
+                  <input type="text" id="allsea-item-detail" value="DAILY REPORT - Special survey EM'CY" placeholder="Chi tiết Items..." style="flex:1;background:#fff;color:#0f172a;border:1px solid #64748b;font-weight:700;padding:6px 10px;" />
+                </div>
+              </td>
+              <td style="border:1px solid #000;padding:8px 10px;">
+                <div style="font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">NGÀY BÁO CÁO (Chọn lịch hoặc tự gõ):</div>
+                <div style="display:flex;gap:6px;">
+                  <input type="date" id="allsea-date-picker" onchange="onPickReportDate(this.value)" style="width:140px;background:#f1f5f9;color:#0f172a;border:1px solid #94a3b8;padding:5px;font-size:12px;" />
+                  <input type="text" id="allsea-report-date" value="Ngày 03/11/2026" style="flex:1;background:#fff;color:#0f172a;border:1px solid #64748b;font-weight:700;padding:6px 10px;" />
+                </div>
+              </td>
+            </tr>
+          </table>
+
+          <div style="font-size:13px;margin-bottom:10px;color:#0f172a;">
+            Kính gửi: <b>BAN LÃNH ĐẠO CÔNG TY.</b>
+          </div>
+
+          <!-- A. HẠNG MỤC PHÁT SINH -->
+          <div style="margin-bottom:10px;">
+            <label style="font-weight:800;font-size:13px;color:#0f172a;display:block;margin-bottom:4px;">A. HẠNG MỤC PHÁT SINH (Nếu có):</label>
+            <input type="text" id="allsea-arising" placeholder="Nhập hạng mục phát sinh trong ngày (hoặc để trống)..." style="background:#f8fafc;color:#0f172a;border:1px solid #94a3b8;padding:8px 10px;" />
+          </div>
+
+          <!-- B. NỘI DUNG CÔNG VIỆC HẰNG NGÀY (BẢNG KHUNG SỬA ĐƯỢC + NÚT '+' THÊM MỤC) -->
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px;">
+            <div style="font-weight:800;font-size:13px;color:#0f172a;">
+              B. NỘI DUNG CÔNG VIỆC HẰNG NGÀY <span style="font-weight:normal;font-size:11px;color:#475569;">(Khung tiêu đề & các ô đều có thể bấm vào sửa trực tiếp)</span>:
+            </div>
+            <div style="display:flex;gap:6px;">
+              <button type="button" class="btn btn-outline" style="padding:5px 10px;font-size:11px;background:#f1f5f9;color:#0f172a;border-color:#94a3b8;" onclick="loadSampleAllseaRows()">📋 Nạp mẫu chuẩn</button>
+              <button type="button" class="btn btn-outline" style="padding:5px 10px;font-size:11px;background:#fee2e2;color:#991b1b;border-color:#fca5a5;" onclick="clearAllseaRows()">🧹 Làm trống bảng</button>
+            </div>
+          </div>
+
+          <div style="overflow-x:auto;border:1.5px solid #000;margin-bottom:10px;">
+            <table id="allsea-work-table" style="width:100%;border-collapse:collapse;background:#fff;color:#0f172a;">
+              <thead>
+                <tr style="background:#e2e8f0;">
+                  <th style="border:1px solid #000;width:54px;padding:6px;">
+                    <input type="text" id="hdr-col-0" value="STT" style="background:transparent;border:none;color:#0f172a;font-weight:800;text-align:center;padding:2px;font-size:12px;" />
+                  </th>
+                  <th style="border:1px solid #000;width:32%;padding:6px;">
+                    <input type="text" id="hdr-col-1" value="NỘI DUNG CÔNG VIỆC" style="background:transparent;border:none;color:#0f172a;font-weight:800;text-align:center;padding:2px;font-size:12px;" />
+                  </th>
+                  <th style="border:1px solid #000;width:42%;padding:6px;">
+                    <input type="text" id="hdr-col-2" value="PHƯƠNG ÁN" style="background:transparent;border:none;color:#0f172a;font-weight:800;text-align:center;padding:2px;font-size:12px;" />
+                  </th>
+                  <th style="border:1px solid #000;width:16%;padding:6px;">
+                    <input type="text" id="hdr-col-3" value="TIẾN ĐỘ DỰ KIẾN" style="background:transparent;border:none;color:#0f172a;font-weight:800;text-align:center;padding:2px;font-size:12px;" />
+                  </th>
+                  <th style="border:1px solid #000;width:38px;padding:4px;text-align:center;color:#0f172a;font-size:11px;">Xóa</th>
+                </tr>
+              </thead>
+              <tbody id="allsea-work-tbody"></tbody>
+            </table>
+          </div>
+
+          <!-- NÚT "+" ĐỂ THÊM MỤC ĐÁNH TAY VÀO -->
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;">
+            <button type="button" onclick="addAllseaWorkRow(false)" style="flex:1;min-width:220px;padding:11px 16px;border-radius:10px;border:2px dashed #0284c7;background:#f0f9ff;color:#0369a1;font-weight:800;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+              <span style="font-size:18px;">➕</span> THÊM MỤC CÔNG VIỆC ĐÁNH TAY (+)
+            </button>
+            <button type="button" onclick="addAllseaWorkRow(true)" style="padding:11px 16px;border-radius:10px;border:1px solid #64748b;background:#f1f5f9;color:#1e293b;font-weight:700;font-size:13px;cursor:pointer;">
+              📁 + Thêm Nhóm Lớn (I, II, III, IV...)
+            </button>
+          </div>
+
+          <!-- C. HÌNH ẢNH SỬA TRONG NGÀY (CHỤP ẢNH HOẶC CHỌN TỪ ĐIỆN THOẠI -> TỰ ĐỘNG SẮP XẾP GỌN GÀNG RÕ NÉT) -->
+          <div style="border-top:2px solid #cbd5e1;padding-top:14px;margin-bottom:18px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+              <div>
+                <div style="font-weight:800;font-size:13.5px;color:#0f172a;">
+                  C. MỘT SỐ HÌNH ẢNH SỬA TRONG NGÀY (<span id="photo-count-label">0</span> ảnh)
+                </div>
+                <div style="font-size:11.5px;color:#475569;">
+                  Chụp trực tiếp từ Camera hoặc chọn nhiều ảnh từ điện thoại -> Tự động căn chỉnh kích thước & sắp xếp lưới 4 cột gọn gàng, rõ nét.
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <label class="btn btn-success" style="cursor:pointer;padding:9px 14px;font-size:12.5px;">
+                  📷 Chụp Ảnh (Camera Điện Thoại)
+                  <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="handleReportPhotosUpload(event)" />
+                </label>
+                <label class="btn btn-primary" style="cursor:pointer;padding:9px 14px;font-size:12.5px;width:auto;">
+                  🖼️ Chọn Nhiều Ảnh Từ Máy
+                  <input type="file" accept="image/*" multiple style="display:none;" onchange="handleReportPhotosUpload(event)" />
+                </label>
+              </div>
+            </div>
+
+            <!-- LƯỚI ẢNH TỰ ĐỘNG SẮP XẾP GỌN GÀNG 4 CỘT -->
+            <div id="allsea-photos-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:10px;min-height:90px;background:#f8fafc;border:1.5px dashed #94a3b8;border-radius:10px;padding:10px;"></div>
+          </div>
+
+          <!-- CÁC NÚT THAO TÁC: LƯU OFFLINE (CHO APK) | GỬI VỀ PYTHON XỬ LÝ | XEM & IN PDF -->
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">
+            <button type="button" onclick="saveReportOffline()" style="padding:14px;border-radius:10px;border:none;background:linear-gradient(135deg,#d97706,#b45309);color:#fff;font-weight:800;font-size:14px;cursor:pointer;">
+              💾 LƯU OFFLINE (KHI KHÔNG CÓ MẠNG)
+            </button>
+            <button type="button" id="btn-send-allsea" onclick="submitAllseaReportToPython()" style="padding:14px;border-radius:10px;border:none;background:linear-gradient(135deg,#0284c7,#1d4ed8);color:#fff;font-weight:800;font-size:14px;cursor:pointer;">
+              🚀 GỬI BÁO CÁO VỀ PYTHON XỬ LÝ NGAY
+            </button>
+            <button type="button" onclick="previewAllseaPrintableNow()" style="padding:14px;border-radius:10px;border:1.5px solid #0f172a;background:#f1f5f9;color:#0f172a;font-weight:800;font-size:13.5px;cursor:pointer;">
+              🖨️ XEM TRƯỚC / XUẤT BÁO CÁO A4 (PDF)
+            </button>
+          </div>
+        </div>
+
+        <!-- ==================== MẪU 2: BẢNG VẼ & KHOANH VÙNG GHI CHÚ BẰNG TAY ==================== -->
+        <div id="tpl-canvas-note" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-top:12px;">
           <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
             <label class="btn btn-success" style="cursor:pointer;">
               📷 Mở Camera Chụp Hình / Chọn Ảnh
@@ -444,7 +650,6 @@
             <button class="btn btn-outline" onclick="clearCanvasWhite()">⬜ Bảng Trắng Ghi Chú Tay</button>
           </div>
 
-          <!-- Bước 2: Canvas vẽ ghi chú bằng tay -->
           <div class="canvas-wrapper">
             <div style="font-size:12px;color:var(--primary-light);margin-bottom:8px;font-weight:600;">
               ✍️ Dùng tay hoặc chuột vẽ/khoanh vùng/viết chữ trực tiếp lên khung bên dưới:
@@ -466,7 +671,6 @@
             </div>
           </div>
 
-          <!-- Bước 3: Thông tin ghi chú kèm theo -->
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;">
             <div class="form-group">
               <label>Tiêu đề hồ sơ / Yêu cầu xử lý *</label>
@@ -484,16 +688,16 @@
 
           <div class="form-group">
             <label>Ghi chú văn bản bổ sung (tùy chọn)</label>
-            <textarea id="sub-note" rows="2" placeholder="Nhập ghi chú thêm cho phần mềm PySide6 (ví dụ: Kiểm tra gấp vùng khoanh đỏ)...">Nhờ hệ thống PySide6 kiểm tra vùng khoanh đỏ trên ảnh và trả về báo cáo tổng hợp.</textarea>
+            <textarea id="sub-note" rows="2">Nhờ hệ thống PySide6 kiểm tra vùng khoanh đỏ trên ảnh và trả về báo cáo tổng hợp.</textarea>
           </div>
 
           <button id="btn-send-sub" class="btn btn-primary" style="padding:15px;font-size:15px;" onclick="submitToPySide6()">
             🚀 GỬI LÊN PYSIDE6 XỬ LÝ & NHẬN BÁO CÁO TỰ ĐỘNG
           </button>
+        </div>
 
-          <div id="submit-progress" style="display:none;margin-top:14px;padding:14px;border-radius:10px;background:#0f172a;border:1px solid var(--primary-light);text-align:center;">
-            <div id="submit-progress-text" style="font-weight:700;color:var(--primary-light);">⏳ Đang gửi dữ liệu về PySide6...</div>
-          </div>
+        <div id="submit-progress" style="display:none;margin-top:14px;padding:14px;border-radius:10px;background:#0f172a;border:1px solid var(--primary-light);text-align:center;">
+          <div id="submit-progress-text" style="font-weight:700;color:var(--primary-light);">⏳ Đang gửi dữ liệu về PySide6...</div>
         </div>
       </div>
     </section>
@@ -577,8 +781,8 @@
       <span>Xem Thực Tế</span>
     </button>
     <button class="nav-item" id="nav-submit" onclick="switchTab('submit')">
-      <span style="font-size:18px;">📸</span>
-      <span>Chụp & Ghi Chú</span>
+      <span style="font-size:18px;">📋</span>
+      <span>Lập Báo Cáo</span>
     </button>
     <button class="nav-item" id="nav-reports" onclick="switchTab('reports')">
       <span style="font-size:18px;">📊</span>
@@ -735,16 +939,20 @@
         const imgB64 = fd.get("canvas_base64") || "";
         const title = fd.get("title") || "Phiếu kiểm tra hiện trường";
         const note_text = fd.get("note_text") || "";
+        let formDataObj = null;
+        try { if (fd.get("form_payload_json")) formDataObj = JSON.parse(fd.get("form_payload_json")); } catch (e) {}
         const sub = {
           id: newId, username, full_name: u.full_name, title, note_text,
           status: "completed", auto_process: 1,
           input_image_url: imgB64, report_image_url: imgB64,
-          report_summary: `Hệ thống AS Fleet & PySide6 đã tự động phân tích ảnh & ghi chú tay '${title}'. Kết quả: ĐẠT YÊU CẦU (100%).`,
+          report_summary: `Hệ thống ALLSEA MANAGEMENT & PySide6 đã tổng hợp '${title}'. Kết quả: ĐÃ XUẤT BÁO CÁO CHUẨN A4.`,
           report_data_json: JSON.stringify({
             report_code: `BC-PYSIDE6-000${newId}`,
+            form_data: formDataObj,
             metrics: [
-              { name: "Độ chính xác nhận diện vùng ghi chú", value: "99.4%", status: "Tốt" },
-              { name: "Trạng thái kiểm duyệt tự động", value: "Hợp lệ (Verified)", status: "Đạt" }
+              { name: "Tên tàu (Ship's Name)", value: formDataObj ? formDataObj.ship_name : "LS JUPITER", status: "Đã xác nhận" },
+              { name: "Loại báo cáo (Items)", value: formDataObj ? formDataObj.item_type : "DAILY REPORT", status: "Hợp lệ" },
+              { name: "Trạng thái tổng hợp Báo cáo A4", value: "Hoàn tất (Ready to Print/PDF)", status: "Đạt" }
             ]
           }),
           created_at: new Date().toLocaleString("vi-VN")
@@ -799,6 +1007,7 @@
       document.getElementById("app-screen").style.display = "block";
       updateUserUI();
       initCanvas();
+      initAllseaDailyForm();
       loadSharedData();
       loadSubmissions();
       if (currentUser.role === "admin") loadUsersAdmin();
@@ -1145,7 +1354,7 @@
                 <button class="btn btn-primary" style="padding:9px;font-size:12px;" onclick="openReportById(${s.id})">
                   📄 Xem Chi Tiết Báo Cáo
                 </button>
-                ${isDone && s.report_html_url ? `<a href="${s.report_html_url}" target="_blank" class="btn btn-outline" style="padding:9px 12px;font-size:12px;text-decoration:none;">🖨️ Bản In / PDF</a>` : ""}
+                ${isDone ? `<button class="btn btn-outline" style="padding:9px 12px;font-size:12px;" onclick="openSavedAllseaReportA4(${s.id})">🖨️ Bản In A4 / PDF</button>` : ""}
               </div>
             </div>
           </div>
@@ -1191,7 +1400,7 @@
       ` : ""}
 
       <div style="display:flex;gap:10px;justify-content:flex-end;">
-        ${s.report_html_url ? `<a href="${s.report_html_url}" target="_blank" class="btn btn-success" style="text-decoration:none;">🖨️ Mở / Tải Báo Cáo Chuẩn In PDF</a>` : ""}
+        ${(s.report_html_url || repData.form_data) ? `<button class="btn btn-success" onclick="openSavedAllseaReportA4(${s.id})">🖨️ Mở / Tải Báo Cáo Chuẩn A4 (PDF)</button>` : ""}
         <button class="btn btn-outline" onclick="closeReportModal()">Đóng</button>
       </div>
     `;
@@ -1312,6 +1521,594 @@
     ws.onclose = () => {
       setTimeout(connectWebSocket, 3000);
     };
+  }
+
+  /* ==================== FORM BÁO CÁO NGÀY ALLSEA MANAGEMENT & CHẾ ĐỘ OFFLINE APK ==================== */
+  let allseaRows = [];
+  let allseaPhotos = [];
+  let customLogoDataUrl = "";
+  const OFFLINE_QUEUE_KEY = "allsea_offline_reports_queue_v1";
+
+  function initAllseaDailyForm() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
+    const dp = document.getElementById("allsea-date-picker");
+    const dtText = document.getElementById("allsea-report-date");
+    if (dp && !dp.value) dp.value = `${yyyy}-${mm}-${dd}`;
+    if (dtText) dtText.value = `Ngày ${dd}/${mm}/${yyyy}`;
+
+    if (allseaRows.length === 0) {
+      loadSampleAllseaRows();
+    } else {
+      renderAllseaWorkTable();
+    }
+    renderAllseaPhotosGrid();
+    updateOnlineStatusBadge();
+    renderOfflineQueueBanner();
+  }
+
+  window.addEventListener("online", () => {
+    updateOnlineStatusBadge();
+    const q = getOfflineQueue();
+    if (q.length > 0) {
+      showToast(`🟢 Đã có mạng lại! Có ${q.length} báo cáo Offline sẵn sàng gửi về Python.`, "#16a34a");
+    }
+  });
+
+  window.addEventListener("offline", () => {
+    updateOnlineStatusBadge();
+    showToast("🟠 Đang mất mạng! Bạn vẫn có thể điền báo cáo & bấm 'Lưu Offline'.", "#d97706");
+  });
+
+  function updateOnlineStatusBadge() {
+    const badge = document.getElementById("net-status-badge");
+    if (!badge) return;
+    if (navigator.onLine) {
+      badge.innerHTML = "🟢 Đang Online (Sẵn sàng gửi về Python)";
+      badge.style.background = "rgba(22,163,74,0.2)";
+      badge.style.color = "#4ade80";
+      badge.style.borderColor = "rgba(74,222,128,0.4)";
+    } else {
+      badge.innerHTML = "🟠 Đang Offline (Chế độ lưu vào bộ nhớ Điện thoại)";
+      badge.style.background = "rgba(234,179,8,0.2)";
+      badge.style.color = "#facc15";
+      badge.style.borderColor = "rgba(250,204,21,0.4)";
+    }
+  }
+
+  function switchReportTemplate(tpl) {
+    document.getElementById("tpl-allsea-daily").style.display = tpl === "allsea_daily" ? "block" : "none";
+    document.getElementById("tpl-canvas-note").style.display = tpl === "canvas_note" ? "block" : "none";
+  }
+
+  function onSelectReportHeaderTitle(val) {
+    document.getElementById("allsea-report-header-title").value = val;
+  }
+
+  function onSelectItemType(val) {
+    const detail = document.getElementById("allsea-item-detail");
+    detail.value = val;
+    if (val === "DAILY REPORT") {
+      document.getElementById("allsea-report-header-title").value = "BÁO CÁO NGÀY";
+    } else if (val === "DOCKING REPORT") {
+      document.getElementById("allsea-report-header-title").value = "BÁO CÁO SỬA CHỮA LÊN ĐÀ (DOCKING REPORT)";
+    } else {
+      document.getElementById("allsea-report-header-title").value = "BÁO CÁO KỸ THUẬT (OTHER REPORT)";
+    }
+  }
+
+  function onPickReportDate(val) {
+    if (!val) return;
+    const parts = val.split("-");
+    if (parts.length === 3) {
+      document.getElementById("allsea-report-date").value = `Ngày ${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+  }
+
+  function changeLogoFile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      customLogoDataUrl = ev.target.result;
+      document.getElementById("allsea-form-logo").src = customLogoDataUrl;
+      showToast("✅ Đã cập nhật Logo trên biểu mẫu Báo cáo!");
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function loadSampleAllseaRows() {
+    allseaRows = [
+      { stt: "I", work: "NHÀ MÁY NOSCO", plan: "", progress: "", is_group: true },
+      { stt: "1", work: "Bắn nước vị trí vỏ tàu", plan: "- Dùng súng tay bắn lại chỗ sót theo yêu cầu và vệ sinh", progress: "Đã xong", is_group: false },
+      { stt: "2", work: "Sơn nước một", plan: "- Sơn tất cả vị trí còn lại và hoàn thiện sơn nước 1", progress: "Đã xong", is_group: false },
+      { stt: "II", work: "CÔNG VIỆC NHÀ THẦU PHỤ", plan: "", progress: "", is_group: true },
+      { stt: "1", work: "TTX máy chính", plan: "- Tháo bulong xuyên block\n- Nhấc block ra khỏi bệ trục\n- Quấn bảo vệ block và bệ trục", progress: "Đã xong", is_group: false },
+      { stt: "III", work: "CÔNG VIỆC TÀU THỰC HIỆN", plan: "", progress: "", is_group: true },
+      { stt: "1", work: "Kiểm tra máy chính mới & thay van", plan: "- Cùng thợ kiểm tra và theo dõi tháo máy\n- Thay van nước (vật tư mới cấp)", progress: "Đang thực hiện", is_group: false },
+      { stt: "IV", work: "PHẦN VẬT TƯ", plan: "", progress: "", is_group: true },
+      { stt: "1", work: "Vật tư phục vụ bảo dưỡng định kỳ", plan: "- Tiếp nhận và kiểm đếm tại tàu", progress: "Đủ", is_group: false }
+    ];
+    renderAllseaWorkTable();
+  }
+
+  function clearAllseaRows() {
+    allseaRows = [
+      { stt: "I", work: "HẠNG MỤC CÔNG VIỆC CHÍNH", plan: "", progress: "", is_group: true },
+      { stt: "1", work: "", plan: "", progress: "", is_group: false }
+    ];
+    renderAllseaWorkTable();
+  }
+
+  function addAllseaWorkRow(isGroup = false) {
+    if (isGroup) {
+      const roman = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"];
+      const groupCount = allseaRows.filter(r => r.is_group).length;
+      allseaRows.push({
+        stt: roman[groupCount] || String(groupCount + 1),
+        work: "NHÓM CÔNG VIỆC MỚI (Nhập tên nhóm...)",
+        plan: "",
+        progress: "",
+        is_group: true
+      });
+    } else {
+      // Tính STT tiếp theo trong nhóm hiện tại
+      let num = 1;
+      for (let i = allseaRows.length - 1; i >= 0; i--) {
+        if (allseaRows[i].is_group) break;
+        const parsed = parseInt(allseaRows[i].stt, 10);
+        if (!isNaN(parsed)) { num = parsed + 1; break; }
+      }
+      allseaRows.push({
+        stt: String(num),
+        work: "",
+        plan: "",
+        progress: "",
+        is_group: false
+      });
+    }
+    renderAllseaWorkTable();
+  }
+
+  function removeAllseaWorkRow(idx) {
+    allseaRows.splice(idx, 1);
+    renderAllseaWorkTable();
+  }
+
+  function updateRowField(idx, field, val) {
+    if (allseaRows[idx]) allseaRows[idx][field] = val;
+  }
+
+  function renderAllseaWorkTable() {
+    const tbody = document.getElementById("allsea-work-tbody");
+    if (!tbody) return;
+    tbody.innerHTML = allseaRows.map((r, idx) => {
+      if (r.is_group) {
+        return `
+          <tr style="background:#f1f5f9;">
+            <td style="border:1px solid #000;padding:4px;">
+              <input type="text" value="${(r.stt || '').replace(/"/g, '&quot;')}" oninput="updateRowField(${idx},'stt',this.value)" style="background:transparent;border:none;color:#0f172a;font-weight:900;text-align:center;padding:4px;font-size:12.5px;" />
+            </td>
+            <td colspan="3" style="border:1px solid #000;padding:4px;">
+              <input type="text" value="${(r.work || '').replace(/"/g, '&quot;')}" oninput="updateRowField(${idx},'work',this.value)" placeholder="Nhập tên nhóm mục lớn (VD: I. NHÀ MÁY NOSCO)..." style="background:transparent;border:none;color:#0f172a;font-weight:900;text-transform:uppercase;padding:4px;font-size:12.5px;" />
+            </td>
+            <td style="border:1px solid #000;text-align:center;padding:4px;">
+              <button type="button" onclick="removeAllseaWorkRow(${idx})" style="background:#fee2e2;color:#dc2626;border:none;border-radius:4px;padding:4px 8px;cursor:pointer;font-weight:bold;">✕</button>
+            </td>
+          </tr>
+        `;
+      }
+      return `
+        <tr>
+          <td style="border:1px solid #000;padding:4px;vertical-align:top;">
+            <input type="text" value="${(r.stt || '').replace(/"/g, '&quot;')}" oninput="updateRowField(${idx},'stt',this.value)" style="background:#fff;border:1px solid #cbd5e1;color:#0f172a;text-align:center;font-weight:700;padding:6px 4px;font-size:12px;" />
+          </td>
+          <td style="border:1px solid #000;padding:4px;vertical-align:top;">
+            <textarea rows="2" oninput="updateRowField(${idx},'work',this.value)" placeholder="Nhập nội dung công việc..." style="background:#fff;border:1px solid #cbd5e1;color:#0f172a;padding:6px;font-size:12.5px;resize:vertical;">${r.work || ''}</textarea>
+          </td>
+          <td style="border:1px solid #000;padding:4px;vertical-align:top;">
+            <textarea rows="2" oninput="updateRowField(${idx},'plan',this.value)" placeholder="Nhập phương án xử lý / sửa chữa..." style="background:#fff;border:1px solid #cbd5e1;color:#0f172a;padding:6px;font-size:12.5px;resize:vertical;">${r.plan || ''}</textarea>
+          </td>
+          <td style="border:1px solid #000;padding:4px;vertical-align:top;">
+            <textarea rows="2" oninput="updateRowField(${idx},'progress',this.value)" placeholder="VD: Đã xong / 05/11" style="background:#fff;border:1px solid #cbd5e1;color:#0f172a;padding:6px;font-size:12.5px;resize:vertical;">${r.progress || ''}</textarea>
+          </td>
+          <td style="border:1px solid #000;text-align:center;padding:4px;vertical-align:middle;">
+            <button type="button" onclick="removeAllseaWorkRow(${idx})" style="background:#fee2e2;color:#dc2626;border:none;border-radius:4px;padding:4px 8px;cursor:pointer;font-weight:bold;">✕</button>
+          </td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  /* TỰ ĐỘNG NÉN CHUẨN NÉT & SẮP XẾP HÌNH ẢNH GỌN GÀNG TRONG LƯỚI 4 CỘT */
+  function handleReportPhotosUpload(e) {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => {
+          const maxDim = 920;
+          let w = img.width, h = img.height;
+          if (w > maxDim || h > maxDim) {
+            const ratio = Math.min(maxDim / w, maxDim / h);
+            w = Math.round(w * ratio);
+            h = Math.round(h * ratio);
+          }
+          const c = document.createElement("canvas");
+          c.width = w;
+          c.height = h;
+          const cctx = c.getContext("2d");
+          cctx.drawImage(img, 0, 0, w, h);
+          const compressedDataUrl = c.toDataURL("image/jpeg", 0.84);
+          allseaPhotos.push({ src: compressedDataUrl, caption: "" });
+          renderAllseaPhotosGrid();
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = "";
+    showToast(`📷 Đã thêm ${files.length} ảnh và tự động căn chỉnh vào khung báo cáo!`);
+  }
+
+  function removeAllseaPhoto(idx) {
+    allseaPhotos.splice(idx, 1);
+    renderAllseaPhotosGrid();
+  }
+
+  function updatePhotoCaption(idx, val) {
+    if (allseaPhotos[idx]) allseaPhotos[idx].caption = val;
+  }
+
+  function renderAllseaPhotosGrid() {
+    const grid = document.getElementById("allsea-photos-grid");
+    const countLbl = document.getElementById("photo-count-label");
+    if (countLbl) countLbl.textContent = allseaPhotos.length;
+    if (!grid) return;
+
+    if (allseaPhotos.length === 0) {
+      grid.innerHTML = `
+        <div style="grid-column:1/-1;text-align:center;padding:22px;color:#64748b;font-size:13px;">
+          📷 Chưa có ảnh đính kèm. Bấm <b>"Chụp Ảnh (Camera Điện Thoại)"</b> hoặc <b>"Chọn Nhiều Ảnh Từ Máy"</b> ở góc phải phía trên để thêm ảnh vào báo cáo.
+        </div>
+      `;
+      return;
+    }
+
+    grid.innerHTML = allseaPhotos.map((p, idx) => `
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 2px 6px rgba(0,0,0,0.06);">
+        <div style="position:relative;height:145px;background:#0f172a;">
+          <img src="${p.src}" onclick="window.open('${p.src}','_blank')" style="width:100%;height:100%;object-fit:cover;cursor:pointer;" title="Bấm để phóng to" />
+          <span style="position:absolute;top:6px;left:6px;background:rgba(15,23,42,0.8);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;">Ảnh #${idx + 1}</span>
+          <button type="button" onclick="removeAllseaPhoto(${idx})" style="position:absolute;top:6px;right:6px;background:rgba(220,38,38,0.9);color:#fff;border:none;border-radius:4px;width:24px;height:24px;cursor:pointer;font-weight:bold;">✕</button>
+        </div>
+        <input type="text" value="${(p.caption || '').replace(/"/g, '&quot;')}" oninput="updatePhotoCaption(${idx}, this.value)" placeholder="Ghi chú ảnh #${idx + 1} (tùy chọn)..." style="border:none;border-top:1px solid #e2e8f0;padding:6px 8px;font-size:11.5px;background:#fff;color:#0f172a;border-radius:0;" />
+      </div>
+    `).join("");
+  }
+
+  function collectAllseaFormPayload() {
+    const ship_name = (document.getElementById("allsea-ship-name").value || "LS JUPITER").trim();
+    const reporter = (document.getElementById("allsea-reporter").value || "Mr. XUÂN ANH").trim();
+    const item_type = (document.getElementById("allsea-item-detail").value || document.getElementById("allsea-item-drop").value || "DAILY REPORT").trim();
+    const report_date = (document.getElementById("allsea-report-date").value || "").trim();
+    const report_header_title = (document.getElementById("allsea-report-header-title").value || "BÁO CÁO NGÀY").trim();
+    const arising_text = (document.getElementById("allsea-arising").value || "").trim();
+    const headers = [
+      document.getElementById("hdr-col-0").value || "STT",
+      document.getElementById("hdr-col-1").value || "NỘI DUNG CÔNG VIỆC",
+      document.getElementById("hdr-col-2").value || "PHƯƠNG ÁN",
+      document.getElementById("hdr-col-3").value || "TIẾN ĐỘ DỰ KIẾN"
+    ];
+    return {
+      template: "ALLSEA_DAILY_REPORT",
+      logo_url: customLogoDataUrl || (window.location.origin + "/allsea_logo.png"),
+      company_title: "ALLSEA MANAGEMENT JSC",
+      report_header_title,
+      ship_name,
+      reporter,
+      item_type,
+      report_date,
+      arising_text,
+      headers,
+      rows: JSON.parse(JSON.stringify(allseaRows)),
+      photos: JSON.parse(JSON.stringify(allseaPhotos)),
+      saved_at: new Date().toLocaleString("vi-VN")
+    };
+  }
+
+  /* LƯU OFFLINE TRÊN ĐIỆN THOẠI APK & TỰ ĐỘNG GỬI KHI CÓ MẠNG */
+  function getOfflineQueue() {
+    try {
+      return JSON.parse(localStorage.getItem(OFFLINE_QUEUE_KEY) || "[]");
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function setOfflineQueue(list) {
+    try {
+      localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(list));
+    } catch (e) {
+      showToast("⚠️ Bộ nhớ trình duyệt đầy, hãy giảm bớt số lượng ảnh hoặc gửi báo cáo cũ!", "#ef4444");
+    }
+    renderOfflineQueueBanner();
+  }
+
+  function saveReportOffline() {
+    const payload = collectAllseaFormPayload();
+    const queue = getOfflineQueue();
+    queue.push({
+      local_id: "OFF-" + Date.now(),
+      username: currentUser ? currentUser.username : "nhanvien1",
+      title: `${payload.report_header_title} - Tàu ${payload.ship_name} (${payload.report_date})`,
+      task_type: payload.item_type,
+      note_text: `Người báo cáo: ${payload.reporter} | Số mục: ${payload.rows.length} | Ảnh: ${payload.photos.length}`,
+      payload
+    });
+    setOfflineQueue(queue);
+    showToast(`💾 Đã lưu báo cáo Tàu ${payload.ship_name} vào bộ nhớ OFFLINE của điện thoại! Khi có mạng chỉ cần bấm 'Gửi về Python'.`, "#d97706");
+  }
+
+  function renderOfflineQueueBanner() {
+    const banner = document.getElementById("offline-queue-banner");
+    const countEl = document.getElementById("offline-count-num");
+    const listEl = document.getElementById("offline-queue-items");
+    if (!banner) return;
+
+    const queue = getOfflineQueue();
+    if (queue.length === 0) {
+      banner.style.display = "none";
+      return;
+    }
+    banner.style.display = "block";
+    countEl.textContent = queue.length;
+    listEl.innerHTML = queue.map((item, idx) => `
+      <div style="display:flex;justify-content:space-between;align-items:center;background:#0f172a;padding:8px 12px;border-radius:8px;border:1px solid #334155;font-size:12px;">
+        <div>
+          <b style="color:#facc15;">#${idx + 1}. ${item.title}</b>
+          <span style="color:#94a3b8;margin-left:8px;">(${item.note_text}) — Lưu lúc: ${item.payload.saved_at}</span>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button type="button" class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="restoreOfflineItem(${idx})">✏️ Mở lại</button>
+          <button type="button" class="btn btn-danger" style="padding:4px 10px;font-size:11px;" onclick="deleteOfflineItem(${idx})">✕ Xóa</button>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function restoreOfflineItem(idx) {
+    const queue = getOfflineQueue();
+    const item = queue[idx];
+    if (!item || !item.payload) return;
+    const p = item.payload;
+    document.getElementById("allsea-report-header-title").value = p.report_header_title || "BÁO CÁO NGÀY";
+    document.getElementById("allsea-ship-name").value = p.ship_name || "LS JUPITER";
+    document.getElementById("allsea-reporter").value = p.reporter || "Mr. XUÂN ANH";
+    document.getElementById("allsea-item-detail").value = p.item_type || "DAILY REPORT";
+    document.getElementById("allsea-report-date").value = p.report_date || "";
+    document.getElementById("allsea-arising").value = p.arising_text || "";
+    allseaRows = p.rows || [];
+    allseaPhotos = p.photos || [];
+    renderAllseaWorkTable();
+    renderAllseaPhotosGrid();
+    showToast(`📂 Đã nạp lại bản lưu Offline: ${item.title}`);
+  }
+
+  function deleteOfflineItem(idx) {
+    const queue = getOfflineQueue();
+    queue.splice(idx, 1);
+    setOfflineQueue(queue);
+  }
+
+  async function syncOfflineQueueNow() {
+    const queue = getOfflineQueue();
+    if (!queue.length) return showToast("Không có báo cáo Offline nào đang chờ!");
+    if (!navigator.onLine) {
+      return showToast("⚠️ Điện thoại vẫn đang mất mạng! Hãy bật Wi-Fi hoặc 4G trước khi đồng bộ.", "#ef4444");
+    }
+
+    showToast(`⏳ Đang đẩy ${queue.length} báo cáo Offline về Python xử lý...`);
+    const remaining = [];
+    for (const item of queue) {
+      try {
+        await sendSingleAllseaPayloadToServer(item.payload, item.username);
+      } catch (e) {
+        remaining.push(item);
+      }
+    }
+    setOfflineQueue(remaining);
+    await loadSubmissions();
+    if (remaining.length === 0) {
+      showToast("🎉 Đã gửi toàn bộ Báo cáo Offline về Python xử lý thành công!", "#16a34a");
+      switchTab("reports");
+    } else {
+      showToast(`⚠️ Đã gửi một phần, còn ${remaining.length} bản chưa gửi được.`, "#eab308");
+    }
+  }
+
+  async function sendSingleAllseaPayloadToServer(payload, username) {
+    const fd = new FormData();
+    const title = `${payload.report_header_title} - Tàu ${payload.ship_name} (${payload.report_date})`;
+    const note_text = `Người báo cáo: ${payload.reporter} | Items: ${payload.item_type} | ${payload.rows.length} hạng mục | ${payload.photos.length} ảnh`;
+    fd.append("username", username || (currentUser ? currentUser.username : "nhanvien1"));
+    fd.append("title", title);
+    fd.append("note_text", note_text);
+    fd.append("task_type", payload.item_type);
+    fd.append("form_payload_json", JSON.stringify(payload));
+    if (payload.photos && payload.photos.length > 0) {
+      fd.append("canvas_base64", payload.photos[0].src);
+    }
+
+    const res = await fetch("/api/submissions", { method: "POST", body: fd });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Lỗi gửi báo cáo");
+
+    const subId = data.submission_id;
+    await fetch(`/api/submissions/${subId}/process`, { method: "POST" });
+    return subId;
+  }
+
+  async function submitAllseaReportToPython() {
+    if (!currentUser) return;
+    if (!navigator.onLine) {
+      saveReportOffline();
+      return;
+    }
+
+    const payload = collectAllseaFormPayload();
+    const btn = document.getElementById("btn-send-allsea");
+    const prog = document.getElementById("submit-progress");
+    const progText = document.getElementById("submit-progress-text");
+
+    btn.disabled = true;
+    prog.style.display = "block";
+    progText.innerHTML = `📤 Đang gửi <b>${payload.report_header_title} (${payload.ship_name})</b> về Python xử lý...`;
+
+    try {
+      const subId = await sendSingleAllseaPayloadToServer(payload, currentUser.username);
+      btn.disabled = false;
+      prog.style.display = "none";
+      showToast(`✅ Python đã xử lý xong Báo cáo Tàu ${payload.ship_name}!`, "#16a34a");
+      await loadSubmissions();
+      switchTab("reports");
+      openReportById(subId);
+    } catch (err) {
+      btn.disabled = false;
+      prog.style.display = "none";
+      // Nếu lỗi mạng đột xuất thì tự động lưu vào Offline Queue cho an toàn!
+      saveReportOffline();
+    }
+  }
+
+  function buildPrintableAllseaHtml(payload) {
+    const headers = payload.headers || ["STT", "NỘI DUNG CÔNG VIỆC", "PHƯƠNG ÁN", "TIẾN ĐỘ DỰ KIẾN"];
+    const rowsHtml = (payload.rows || []).map(r => {
+      if (r.is_group) {
+        return `<tr style="background:#f1f5f9;font-weight:bold;"><td style="text-align:center;">${r.stt || ''}</td><td colspan="3" style="text-transform:uppercase;">${r.work || ''}</td></tr>`;
+      }
+      return `<tr>
+        <td style="text-align:center;">${r.stt || ''}</td>
+        <td>${(r.work || '').replace(/\n/g, '<br/>')}</td>
+        <td>${(r.plan || '').replace(/\n/g, '<br/>')}</td>
+        <td>${(r.progress || '').replace(/\n/g, '<br/>')}</td>
+      </tr>`;
+    }).join("");
+
+    const photosHtml = (payload.photos && payload.photos.length) ? `
+      <div style="font-weight:bold;margin:18px 0 8px 18px;font-size:13px;">C. MỘT SỐ HÌNH ẢNH SỬA TRONG NGÀY:</div>
+      <div class="photo-grid">
+        ${payload.photos.map(p => `
+          <div class="photo-cell">
+            <img src="${p.src}" alt="Photo"/>
+            ${p.caption ? `<div style="font-size:11px;padding:3px;text-align:center;">${p.caption}</div>` : ""}
+          </div>
+        `).join("")}
+      </div>
+    ` : "";
+
+    return `<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>${payload.report_header_title} - ${payload.ship_name}</title>
+<style>
+  body { font-family: 'Tahoma', Arial, sans-serif; margin: 0; padding: 20px; background: #cbd5e1; color: #000; font-size: 13px; }
+  .a4 { max-width: 820px; margin: 0 auto; background: #fff; padding: 28px 34px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+  .print-bar { max-width: 820px; margin: 0 auto 12px; display: flex; justify-content: space-between; }
+  .btn-p { background: #0284c7; color: #fff; border: none; padding: 10px 18px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+  table { width: 100%; border-collapse: collapse; }
+  .hdr-tbl { border: 2px solid #000; margin-bottom: 12px; }
+  .hdr-tbl td { border: 1.5px solid #000; padding: 8px 12px; }
+  .meta-tbl { border: 1.5px solid #000; margin-bottom: 12px; }
+  .meta-tbl td { border: 1px solid #000; padding: 6px 10px; }
+  .work-tbl { border: 1.5px solid #000; margin-top: 6px; font-size: 12.5px; }
+  .work-tbl th, .work-tbl td { border: 1px solid #000; padding: 6px 8px; vertical-align: top; line-height: 1.4; }
+  .work-tbl th { background: #f8fafc; text-align: center; }
+  .photo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px; }
+  .photo-cell { border: 1px solid #94a3b8; page-break-inside: avoid; }
+  .photo-cell img { width: 100%; height: 160px; object-fit: cover; display: block; }
+  @media print { body { background: #fff; padding: 0; } .print-bar { display: none; } .a4 { box-shadow: none; padding: 8px; max-width: 100%; } }
+</style>
+</head>
+<body>
+<div class="print-bar">
+  <button class="btn-p" onclick="window.print()">🖨️ In Báo Cáo / Lưu File PDF Chuẩn A4</button>
+  <button class="btn-p" style="background:#475569;" onclick="window.close()">✕ Đóng</button>
+</div>
+<div class="a4">
+  <table class="hdr-tbl">
+    <tr>
+      <td style="width:105px;text-align:center;"><img src="${payload.logo_url}" style="width:68px;height:68px;object-fit:contain;"/></td>
+      <td style="text-align:center;">
+        <div style="font-size:16px;font-weight:bold;">ALLSEA MANAGEMENT JSC</div>
+        <div style="font-size:12px;font-weight:bold;color:#334155;">CÔNG TY CỔ PHẦN ALLSEA MANAGEMENT</div>
+        <div style="font-size:15px;font-weight:bold;margin-top:4px;text-transform:uppercase;">${payload.report_header_title}</div>
+      </td>
+    </tr>
+  </table>
+  <table class="meta-tbl">
+    <tr>
+      <td style="width:52%;"><b>Ship's name :</b> &nbsp;${payload.ship_name}</td>
+      <td style="width:48%;"><b>Superintendent :</b> &nbsp;${payload.reporter}</td>
+    </tr>
+    <tr>
+      <td colspan="2"><b>Items :</b> &nbsp;${payload.item_type}</td>
+    </tr>
+  </table>
+  <div style="margin:10px 0;">Kính gửi: <b>BAN LÃNH ĐẠO CÔNG TY.</b></div>
+  <div style="font-weight:bold;margin:12px 0;">${payload.report_date}</div>
+  <div style="font-weight:bold;margin:4px 0 4px 18px;">A. HẠNG MỤC PHÁT SINH: <span style="font-weight:normal;">${payload.arising_text || ''}</span></div>
+  <div style="font-weight:bold;margin:4px 0 6px 18px;">B. NỘI DUNG CÔNG VIỆC HẰNG NGÀY:</div>
+  <table class="work-tbl">
+    <thead>
+      <tr>
+        <th style="width:45px;">${headers[0]}</th>
+        <th style="width:33%;">${headers[1]}</th>
+        <th style="width:44%;">${headers[2]}</th>
+        <th style="width:16%;">${headers[3]}</th>
+      </tr>
+    </thead>
+    <tbody>${rowsHtml}</tbody>
+  </table>
+  ${photosHtml}
+</div>
+</body>
+</html>`;
+  }
+
+  function previewAllseaPrintableNow() {
+    const payload = collectAllseaFormPayload();
+    const html = buildPrintableAllseaHtml(payload);
+    const w = window.open("", "_blank");
+    if (w) {
+      w.document.open();
+      w.document.write(html);
+      w.document.close();
+    } else {
+      showToast("⚠️ Trình duyệt chặn cửa sổ bật lên, hãy cho phép Pop-up!", "#eab308");
+    }
+  }
+
+  function openSavedAllseaReportA4(id) {
+    const s = cachedSubmissions.find(x => x.id === id);
+    if (!s) return;
+    if (s.report_html_url) {
+      window.open(s.report_html_url, "_blank");
+      return;
+    }
+    let repData = {};
+    try { repData = JSON.parse(s.report_data_json || "{}"); } catch (e) {}
+    if (repData.form_data) {
+      const html = buildPrintableAllseaHtml(repData.form_data);
+      const w = window.open("", "_blank");
+      if (w) { w.document.open(); w.document.write(html); w.document.close(); }
+    }
   }
 
   if ("serviceWorker" in navigator) {

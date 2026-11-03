@@ -153,6 +153,10 @@ def init_db():
         processed_at TEXT
     )
     """)
+    try:
+        cur.execute("ALTER TABLE submissions ADD COLUMN form_payload_json TEXT")
+    except Exception:
+        pass
 
     cur.execute("SELECT COUNT(*) as cnt FROM users")
     if cur.fetchone()["cnt"] == 0:
@@ -284,9 +288,16 @@ class TunnelUpdate(BaseModel):
     public_url: str = ""
 
 
-def generate_report_files(sub_id: int, title: str, username: str, full_name: str, note_text: str, task_type: str, input_image_path: Optional[Path], custom_conclusion: Optional[str] = None):
+def generate_report_files(sub_id: int, title: str, username: str, full_name: str, note_text: str, task_type: str, input_image_path: Optional[Path], custom_conclusion: Optional[str] = None, form_payload_json: Optional[str] = None):
     now_str = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     report_code = f"BC-PYSIDE6-{sub_id:04d}"
+
+    form_data = {}
+    if form_payload_json:
+        try:
+            form_data = json.loads(form_payload_json)
+        except Exception:
+            form_data = {}
 
     out_img_name = f"report_img_{sub_id}_{int(time.time())}.png"
     out_img_path = REPORTS_DIR / out_img_name
@@ -305,8 +316,8 @@ def generate_report_files(sub_id: int, title: str, username: str, full_name: str
     draw = ImageDraw.Draw(report_canvas)
 
     draw.rectangle([0, 0, canvas_w, 85], fill=(3, 105, 161))
-    draw.text((25, 18), f"KET QUA XU LY TU DONG TU PYSIDE6 - MA: {report_code}", fill=(255, 255, 255))
-    draw.text((25, 48), f"Nguoi gui: {full_name} ({username}) | Thoi gian hoan thanh: {now_str}", fill=(224, 242, 254))
+    draw.text((25, 18), f"ALLSEA MANAGEMENT JSC - REPORT ({report_code})", fill=(255, 255, 255))
+    draw.text((25, 48), f"Nguoi bao cao: {form_data.get('reporter') or full_name} | Tau: {form_data.get('ship_name') or 'N/A'} | {now_str}", fill=(224, 242, 254))
 
     y_offset = 100
     if base_img:
@@ -321,9 +332,13 @@ def generate_report_files(sub_id: int, title: str, username: str, full_name: str
         y_offset += base_img.height + 20
 
     draw.rectangle([25, y_offset, canvas_w - 25, canvas_h - 20], fill=(30, 41, 59), outline=(56, 189, 248), width=2)
-    conclusion = custom_conclusion or f"PySide6 da phan tich hinh anh & ghi chu '{title}'. Ket qua: DAT TIEU CHUAN (100%)."
-    draw.text((40, y_offset + 15), f"Loai yeu cau: {task_type}", fill=(56, 189, 248))
-    draw.text((40, y_offset + 42), f"Ghi chu goc: {(note_text or 'Ghi chu viet tay tren anh')[:85]}", fill=(226, 232, 240))
+    ship_name = form_data.get("ship_name") or "LS JUPITER"
+    report_title_type = form_data.get("report_header_title") or "BÁO CÁO NGÀY (DAILY REPORT)"
+    rows_count = len(form_data.get("rows") or [])
+    photos_count = len(form_data.get("photos") or [])
+    conclusion = custom_conclusion or f"PySide6 da tong hop '{report_title_type}' - Tau {ship_name} ({rows_count} hang muc, {photos_count} hinh anh)."
+    draw.text((40, y_offset + 15), f"Tau: {ship_name} | Items: {form_data.get('item_type') or task_type}", fill=(56, 189, 248))
+    draw.text((40, y_offset + 42), f"So hang muc cong viec: {rows_count} muc | Hinh anh dinh kem: {photos_count} anh", fill=(226, 232, 240))
     draw.text((40, y_offset + 70), f"Ket luan PySide6: {conclusion[:85]}", fill=(74, 222, 128))
 
     report_canvas.save(str(out_img_path), "PNG")
@@ -331,68 +346,158 @@ def generate_report_files(sub_id: int, title: str, username: str, full_name: str
 
     report_data = {
         "report_code": report_code,
-        "processed_by": "Phần mềm máy tính PySide6 (Engine Tự Động)",
+        "processed_by": "Phần mềm máy tính PySide6 (Allsea Report Engine)",
         "processed_at": now_str,
-        "sender": f"{full_name} ({username})",
-        "task_type": task_type,
-        "status_badge": "ĐẠT CHUẨN / ĐÃ PHÊ DUYỆT",
-        "conclusion": custom_conclusion or f"Hệ thống PySide6 đã tiếp nhận hình ảnh chụp + vùng khoanh ghi chú tay của tài khoản '{username}', tự động phân tích và xuất báo cáo hoàn tất.",
+        "sender": f"{form_data.get('reporter') or full_name} ({username})",
+        "ship_name": ship_name,
+        "task_type": form_data.get("item_type") or task_type,
+        "status_badge": "ĐÃ TỔNG HỢP BÁO CÁO CHUẨN ALLSEA",
+        "conclusion": conclusion,
+        "form_data": form_data,
         "metrics": [
-            {"name": "Độ chính xác nhận diện vùng ghi chú", "value": "99.4%", "status": "Tốt"},
-            {"name": "Trạng thái kiểm tra quy trình PySide6", "value": "Hợp lệ (Auto-Verified)", "status": "Đạt"},
-            {"name": "Thời gian phản hồi hệ thống", "value": "1.2 giây", "status": "Nhanh"},
+            {"name": "Tên tàu (Ship's Name)", "value": ship_name, "status": "Đã xác nhận"},
+            {"name": "Loại báo cáo (Items)", "value": form_data.get("item_type") or task_type, "status": "Hợp lệ"},
+            {"name": "Tổng số hạng mục & Hình ảnh", "value": f"{rows_count} mục / {photos_count} ảnh", "status": "Hoàn tất"},
         ]
     }
 
+    # Tạo file Báo cáo chuẩn A4 theo đúng mẫu ALLSEA MANAGEMENT JSC REPORT
     html_name = f"bao_cao_{report_code}.html"
     html_path = REPORTS_DIR / html_name
+
+    headers = form_data.get("headers") or ["STT", "NỘI DUNG CÔNG VIỆC", "PHƯƠNG ÁN", "TIẾN ĐỘ DỰ KIẾN"]
+    rows = form_data.get("rows") or []
+    photos = form_data.get("photos") or ([] if not report_image_url else [report_image_url])
+    logo_src = form_data.get("logo_url") or "/allsea_logo.png"
+    rep_header_title = form_data.get("report_header_title") or "BÁO CÁO NGÀY"
+    reporter_name = form_data.get("reporter") or full_name
+    item_type_str = form_data.get("item_type") or task_type
+    report_date_str = form_data.get("report_date") or datetime.now().strftime("Ngày %d/%m/%Y")
+    arising_str = form_data.get("arising_text") or ""
+
+    rows_html = ""
+    for r in rows:
+        if r.get("is_group"):
+            rows_html += f"""
+            <tr class="group-row">
+              <td style="text-align:center;font-weight:bold;">{r.get('stt','')}</td>
+              <td colspan="3" style="font-weight:bold;text-transform:uppercase;">{r.get('work','')}</td>
+            </tr>"""
+        else:
+            work_Formatted = (r.get("work") or "").replace("\n", "<br/>")
+            plan_Formatted = (r.get("plan") or "").replace("\n", "<br/>")
+            prog_Formatted = (r.get("progress") or "").replace("\n", "<br/>")
+            rows_html += f"""
+            <tr>
+              <td style="text-align:center;">{r.get('stt','')}</td>
+              <td>{work_Formatted}</td>
+              <td>{plan_Formatted}</td>
+              <td>{prog_Formatted}</td>
+            </tr>"""
+
+    photos_html = ""
+    if photos:
+        imgs_tags = "".join(
+            f'<div class="photo-cell"><img src="{p.get("src") if isinstance(p, dict) else p}" alt="Ảnh hiện trường"/><div class="photo-cap">{p.get("caption","") if isinstance(p, dict) else ""}</div></div>'
+            for p in photos
+        )
+        photos_html = f"""
+        <div class="section-title" style="margin-top:18px;">C. MỘT SỐ HÌNH ẢNH SỬA TRONG NGÀY:</div>
+        <div class="photo-grid">{imgs_tags}</div>
+        """
+
     html_content = f"""<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Báo Cáo {report_code} - PySide6</title>
+<title>{rep_header_title} - {ship_name} ({report_code})</title>
 <style>
-  body {{ font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 24px; background: #f1f5f9; color: #0f172a; }}
-  .page {{ max-width: 820px; margin: 0 auto; background: #fff; padding: 32px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }}
-  .header {{ display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #0284c7; padding-bottom: 16px; margin-bottom: 20px; }}
-  .badge {{ background: #16a34a; color: #fff; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 13px; }}
-  table {{ width: 100%; border-collapse: collapse; margin: 18px 0; }}
-  th, td {{ border: 1px solid #cbd5e1; padding: 10px 14px; text-align: left; font-size: 14px; }}
-  th {{ background: #f8fafc; color: #334155; }}
-  .img-box {{ text-align: center; margin: 20px 0; }}
-  .img-box img {{ max-width: 100%; border-radius: 8px; border: 2px solid #0284c7; }}
-  .print-btn {{ background: #0284c7; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-bottom: 16px; }}
-  @media print {{ .print-btn {{ display: none; }} body {{ background: #fff; padding: 0; }} .page {{ box-shadow: none; }} }}
+  body {{ font-family: 'Tahoma', 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background: #e2e8f0; color: #000; font-size: 13px; }}
+  .a4-page {{ max-width: 840px; margin: 0 auto; background: #fff; padding: 28px 34px; box-shadow: 0 4px 25px rgba(0,0,0,0.15); }}
+  .top-actions {{ max-width: 840px; margin: 0 auto 12px; display: flex; justify-content: space-between; align-items: center; }}
+  .print-btn {{ background: #0284c7; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; }}
+  /* Bảng Header Logo & Tên Công Ty */
+  .header-table {{ width: 100%; border-collapse: collapse; border: 2px solid #000; margin-bottom: 14px; }}
+  .header-table td {{ border: 1.5px solid #000; padding: 10px 14px; vertical-align: middle; }}
+  .logo-cell {{ width: 115px; text-align: center; }}
+  .logo-cell img {{ width: 72px; height: 72px; object-fit: contain; }}
+  .title-cell {{ text-align: center; }}
+  .company-name {{ font-size: 16px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.4px; }}
+  .report-name {{ font-size: 15px; font-weight: bold; text-transform: uppercase; margin-top: 4px; }}
+  /* Bảng Ship's name / Superintendent / Items */
+  .meta-table {{ width: 100%; border-collapse: collapse; border: 1.5px solid #000; margin-bottom: 14px; font-size: 13px; }}
+  .meta-table td {{ border: 1px solid #000; padding: 6px 10px; }}
+  .salutation {{ margin: 10px 0 14px; font-size: 13px; }}
+  .date-line {{ font-weight: bold; margin: 12px 0; font-size: 13.5px; }}
+  .section-title {{ font-weight: bold; margin: 6px 0 6px 18px; font-size: 13px; text-transform: uppercase; }}
+  /* Bảng Nội dung công việc */
+  .work-table {{ width: 100%; border-collapse: collapse; border: 1.5px solid #000; margin-top: 8px; font-size: 12.5px; }}
+  .work-table th, .work-table td {{ border: 1px solid #000; padding: 6px 8px; vertical-align: top; line-height: 1.4; }}
+  .work-table th {{ background: #f8fafc; text-align: center; font-weight: bold; text-transform: uppercase; }}
+  .group-row td {{ background: #f1f5f9; font-weight: bold; }}
+  /* Lưới hình ảnh tự động sắp xếp 4 cột gọn gàng, rõ nét */
+  .photo-grid {{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px; }}
+  .photo-cell {{ border: 1px solid #cbd5e1; background: #f8fafc; overflow: hidden; page-break-inside: avoid; display: flex; flex-direction: column; }}
+  .photo-cell img {{ width: 100%; height: 165px; object-fit: cover; display: block; }}
+  .photo-cap {{ font-size: 11px; padding: 3px 5px; text-align: center; color: #334155; }}
+  @media (max-width: 650px) {{ .photo-grid {{ grid-template-columns: repeat(2, 1fr); }} }}
+  @media print {{
+    body {{ background: #fff; padding: 0; }}
+    .top-actions {{ display: none; }}
+    .a4-page {{ box-shadow: none; padding: 10px; max-width: 100%; }}
+    .photo-grid {{ grid-template-columns: repeat(4, 1fr); }}
+  }}
 </style>
 </head>
 <body>
-<div class="page">
-  <button class="print-btn" onclick="window.print()">🖨️ In Báo Cáo / Lưu thành PDF</button>
-  <div class="header">
-    <div>
-      <h2 style="margin:0;color:#0369a1;">BÁO CÁO KẾT QUẢ XỬ LÝ TỰ ĐỘNG - PYSIDE6</h2>
-      <p style="margin:4px 0 0;color:#64748b;font-size:13px;">Mã báo cáo: <b>{report_code}</b> | Ngày xuất: {now_str}</p>
-    </div>
-    <span class="badge">✓ ĐÃ XỬ LÝ HOÀN TẤT</span>
-  </div>
-  <table>
-    <tr><th>Tiêu đề yêu cầu</th><td><b>{title}</b></td><th>Loại xử lý</th><td>{task_type}</td></tr>
-    <tr><th>Tài khoản gửi</th><td>{full_name} ({username})</td><th>Nguồn xử lý</th><td>PySide6 Desktop Engine</td></tr>
-    <tr><th>Ghi chú kèm theo</th><td colspan="3">{note_text or 'Có ghi chú vẽ tay trực tiếp trên hình ảnh'}</td></tr>
-    <tr><th>Kết luận từ PySide6</th><td colspan="3" style="color:#15803d;font-weight:bold;">{report_data['conclusion']}</td></tr>
+<div class="top-actions">
+  <button class="print-btn" onclick="window.print()">🖨️ In Báo Cáo / Xuất File PDF Chuẩn A4</button>
+  <span style="color:#475569;font-size:12px;">Mã quản lý PySide6: <b>{report_code}</b> | Xử lý lúc: {now_str}</span>
+</div>
+<div class="a4-page">
+  <table class="header-table">
+    <tr>
+      <td class="logo-cell"><img src="{logo_src}" alt="Allsea Logo"/></td>
+      <td class="title-cell">
+        <div class="company-name">ALLSEA MANAGEMENT JSC</div>
+        <div style="font-size:12px;color:#334155;font-weight:bold;">CÔNG TY CỔ PHẦN ALLSEA MANAGEMENT</div>
+        <div class="report-name">{rep_header_title}</div>
+      </td>
+    </tr>
   </table>
-  <h4>Bảng thông số phân tích chi tiết:</h4>
-  <table>
-    <thead><tr><th>Hạng mục kiểm tra</th><th>Kết quả đo / Phân tích</th><th>Đánh giá</th></tr></thead>
+
+  <table class="meta-table">
+    <tr>
+      <td style="width:52%;"><b>Ship's name :</b> &nbsp;{ship_name}</td>
+      <td style="width:48%;"><b>Người báo cáo (Superintendent) :</b> &nbsp;{reporter_name}</td>
+    </tr>
+    <tr>
+      <td colspan="2"><b>Items :</b> &nbsp;{item_type_str}</td>
+    </tr>
+  </table>
+
+  <div class="salutation">Kính gửi: <b>BAN LÃNH ĐẠO CÔNG TY.</b></div>
+  <div class="date-line">{report_date_str}</div>
+
+  <div class="section-title">A. HẠNG MỤC PHÁT SINH: <span style="font-weight:normal;text-transform:none;">{arising_str}</span></div>
+  <div class="section-title">B. NỘI DUNG CÔNG VIỆC HẰNG NGÀY:</div>
+
+  <table class="work-table">
+    <thead>
+      <tr>
+        <th style="width:46px;">{headers[0] if len(headers)>0 else 'STT'}</th>
+        <th style="width:34%;">{headers[1] if len(headers)>1 else 'NỘI DUNG CÔNG VIỆC'}</th>
+        <th style="width:42%;">{headers[2] if len(headers)>2 else 'PHƯƠNG ÁN'}</th>
+        <th style="width:16%;">{headers[3] if len(headers)>3 else 'TIẾN ĐỘ DỰ KIẾN'}</th>
+      </tr>
+    </thead>
     <tbody>
-      {''.join(f"<tr><td>{m['name']}</td><td><b>{m['value']}</b></td><td style='color:#16a34a;font-weight:bold;'>{m['status']}</td></tr>" for m in report_data['metrics'])}
+      {rows_html}
     </tbody>
   </table>
-  <div class="img-box">
-    <h4>Hình ảnh Tài liệu & Ghi chú đã được PySide6 đóng dấu xác nhận:</h4>
-    <img src="{report_image_url}" alt="Processed Image"/>
-  </div>
+
+  {photos_html}
 </div>
 </body>
 </html>"""
@@ -642,8 +747,9 @@ async def create_submission(
     username: str = Form(...),
     title: str = Form(...),
     note_text: str = Form(""),
-    task_type: str = Form("Phân tích Ảnh & Ghi chú tay -> Xuất Báo cáo"),
+    task_type: str = Form("DAILY REPORT"),
     canvas_base64: Optional[str] = Form(None),
+    form_payload_json: Optional[str] = Form(None),
     image_file: Optional[UploadFile] = File(None),
 ):
     conn = get_db()
@@ -679,9 +785,9 @@ async def create_submission(
     auto_proc = int(user["auto_process"] == 1 and manager.pyside6_auto_mode)
 
     cur.execute("""
-        INSERT INTO submissions (username, full_name, title, note_text, task_type, input_image_url, status, auto_process, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, (username, user["full_name"], title, note_text, task_type, input_image_url, "pending", auto_proc, now))
+        INSERT INTO submissions (username, full_name, title, note_text, task_type, input_image_url, status, auto_process, form_payload_json, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (username, user["full_name"], title, note_text, task_type, input_image_url, "pending", auto_proc, form_payload_json, now))
     sub_id = cur.lastrowid
     conn.commit()
 
@@ -743,9 +849,10 @@ async def process_submission_by_pyside6(
         username=sub["username"],
         full_name=sub["full_name"],
         note_text=sub["note_text"] or "",
-        task_type=sub["task_type"] or "Phân tích & Báo cáo",
+        task_type=sub["task_type"] or "DAILY REPORT",
         input_image_path=input_path,
         custom_conclusion=custom_conclusion,
+        form_payload_json=sub["form_payload_json"] if "form_payload_json" in sub.keys() else None,
     )
 
     now = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
