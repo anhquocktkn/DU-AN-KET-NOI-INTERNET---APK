@@ -809,6 +809,14 @@ def serve_web_app():
     return HTMLResponse("<h3>Đang khởi tạo giao diện Web/APK...</h3>")
 
 
+@app.get("/{asset_name}")
+def serve_web_assets(asset_name: str):
+    safe_path = (WEB_DIR / asset_name).resolve()
+    if safe_path.parent == WEB_DIR.resolve() and safe_path.exists() and safe_path.is_file():
+        return FileResponse(str(safe_path))
+    raise HTTPException(status_code=404, detail="Không tìm thấy file")
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

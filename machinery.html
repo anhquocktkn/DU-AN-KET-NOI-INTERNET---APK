@@ -1,0 +1,254 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Machinery Specs - Allsea Management</title>
+    <style>
+        :root {
+            --primary-color: #1b365d;
+            --secondary-color: #4a777a;
+            --accent-color: #e8f1f5;
+            --border-color: #cbd5e1;
+            --text-main: #1e293b;
+            --bg-body: #f8fafc;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-body); color: var(--text-main); padding: 12px; }
+        .container { max-width: 1400px; margin: 0 auto; background: white; padding: 16px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        
+        .nav-tabs { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 2px solid var(--primary-color); padding-bottom: 8px; flex-wrap: wrap; gap: 10px; }
+        .tab-group { display: flex; gap: 6px; flex-wrap: wrap; }
+        .tab-btn { background: #e2e8f0; color: var(--text-main); border: none; padding: 6px 10px; font-size: 11px; font-weight: 700; border-radius: 4px; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; }
+        .tab-btn:hover { background: #cbd5e1; }
+        .tab-btn.active { background: var(--primary-color); color: white; }
+
+        .action-btns { display: flex; gap: 6px; }
+        .action-btn { background: #0d9488; color: white; border: none; padding: 6px 12px; font-size: 11px; font-weight: 700; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s; }
+        .action-btn:hover { background: #0f766e; }
+
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        h1 { font-size: 16px; color: var(--primary-color); font-weight: 700; text-transform: uppercase; }
+        
+        .filters-group { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+        .filter-section { display: flex; align-items: center; gap: 6px; }
+        label { font-weight: 600; font-size: 12px; color: var(--primary-color); white-space: nowrap; }
+        select { padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border-color); font-size: 12px; background: white; cursor: pointer; outline: none; min-width: 180px; font-weight: 600; }
+        select:focus { border-color: var(--primary-color); }
+        
+        .top-dashboard { display: grid; grid-template-columns: 280px 1fr; gap: 15px; margin-bottom: 15px; align-items: start; }
+        @media(max-width: 900px) { .top-dashboard { grid-template-columns: 1fr; } }
+        
+        .vessel-profile { background: #fff; border: 1px solid var(--border-color); border-radius: 6px; overflow: hidden; display: flex; flex-direction: column; }
+        .vessel-img-container { width: 100%; height: 180px; background: #e2e8f0; position: relative; overflow: hidden; }
+        .vessel-img-container img { width: 100%; height: 100%; object-fit: cover; }
+        .vessel-name-banner { background: var(--primary-color); color: white; padding: 8px 10px; font-weight: 700; font-size: 14px; text-align: center; }
+
+        .specs-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        @media(max-width: 900px) { .specs-grid { grid-template-columns: 1fr; } }
+
+        .spec-card { background: #ffffff; border: 1px solid var(--border-color); border-radius: 6px; padding: 12px 14px; display: flex; flex-direction: column; justify-content: flex-start; }
+        .spec-card.full-width { grid-column: span 2; }
+        @media(max-width: 900px) { .spec-card.full-width { grid-column: span 1; } }
+        
+        .spec-label { font-size: 11px; color: #0d9488; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; font-weight: 800; border-bottom: 1px solid #f1f5f9; padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .spec-value { font-size: 13px; color: var(--text-main); font-weight: 600; line-height: 1.5; white-space: pre-line; }
+
+        .footer-note { margin-top: 12px; font-size: 10px; color: #64748b; text-align: right; }
+
+        @media print {
+            body { background-color: white; padding: 0; }
+            .container { box-shadow: none; padding: 0; max-width: 100%; }
+            .nav-tabs, .filters-group, .action-btns, .vessel-img-container { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="nav-tabs">
+        <div class="tab-group">
+            <a href="vessel-plan.html" onclick="return navigateTab(event, 'vessel-plan.html')" class="tab-btn">📋 Vessel Plan</a>
+            <a href="machinery.html" onclick="return navigateTab(event, 'machinery.html')" class="tab-btn active">⚙️ Machinery Specs</a>
+            <a href="tech-visit.html" onclick="return navigateTab(event, 'tech-visit.html')" class="tab-btn">🔍 Tech Visit & Audit</a>
+            <a href="cii-rating.html" onclick="return navigateTab(event, 'cii-rating.html')" class="tab-btn">🌱 Fleet CII Rating</a>
+            <a href="defect-list.html" onclick="return navigateTab(event, 'defect-list.html')" class="tab-btn">📑 Defect & Repair List</a>
+        </div>
+        <div class="action-btns">
+            <button class="action-btn" onclick="window.print()">🖨️ In / Xuất PDF</button>
+        </div>
+    </div>
+
+    <div id="page2">
+        <header>
+            <h1>VESSEL MACHINERY SPECIFICATIONS</h1>
+            <div class="filters-group">
+                <div class="filter-section">
+                    <label for="vesselSelect2">Select Vessel:</label>
+                    <select id="vesselSelect2" onchange="updateDashboard2()"></select>
+                </div>
+            </div>
+        </header>
+
+        <div class="top-dashboard">
+            <div class="vessel-profile">
+                <div class="vessel-img-container"><img id="vesselImg2" src="" alt="Vessel Image" onerror="this.src='https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=600&q=80'"></div>
+                <div class="vessel-name-banner" id="bannerVesselName2">--</div>
+            </div>
+            
+            <div class="specs-grid">
+                <div class="spec-card">
+                    <div class="spec-label">Main Engine</div>
+                    <div class="spec-value" id="specMainEngine">Đang đồng bộ từ Google Sheets...</div>
+                </div>
+                <div class="spec-card">
+                    <div class="spec-label">GE</div>
+                    <div class="spec-value" id="specGE">Đang đồng bộ từ Google Sheets...</div>
+                </div>
+                <div class="spec-card">
+                    <div class="spec-label">Cargo Pump</div>
+                    <div class="spec-value" id="specCargoPump">Đang đồng bộ từ Google Sheets...</div>
+                </div>
+                <div class="spec-card">
+                    <div class="spec-label">Other Pump On Deck</div>
+                    <div class="spec-value" id="specPumpOnDeck">Đang đồng bộ từ Google Sheets...</div>
+                </div>
+                <div class="spec-card full-width">
+                    <div class="spec-label" style="color: #d97706;">Other</div>
+                    <div class="spec-value" id="specOther" style="color: #475569;">Đang đồng bộ từ Google Sheets...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-note">Allsea Management JSC | Technical Dept (Prepared by: Alber)</div>
+</div>
+
+<script>
+    /*__INJECT_VESSEL_IMAGES__*/
+    window.__allseaMemStore = window.__allseaMemStore || {};
+    function safeGetCache(key) {
+        if (window.__allseaMemStore[key] !== undefined) return window.__allseaMemStore[key];
+        try { return sessionStorage.getItem(key); } catch (e) { return null; }
+    }
+    function safeSetCache(key, val) {
+        window.__allseaMemStore[key] = val;
+        try { sessionStorage.setItem(key, val); } catch (e) {}
+    }
+
+    var globalFleetData = {};
+    var liveSheetSpecs = {};
+
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzU5kWNkCEfr8EwubNgTK3V4yu1raWS8TfvO224DYCHR2hvTWU7u9BhOTmxadGNfXY/exec";
+    var vesselImageMap = window.__injectedVesselImages || {};
+
+    function navigateTab(e, pageFile) {
+        if (typeof google !== "undefined" && google.script && google.script.run) {
+            e.preventDefault();
+            google.script.run.withSuccessHandler(function(html) {
+                document.open();
+                document.write(html);
+                document.close();
+            }).getPageContent(pageFile);
+            return false;
+        }
+        return true;
+    }
+
+    function resolveVesselImg(fileName) {
+        if (!fileName) return "";
+        if (vesselImageMap[fileName]) return vesselImageMap[fileName];
+        var altName = fileName.replace(/^GT_MG[-_]/i, "MG_").replace(/-/g, "_");
+        if (vesselImageMap[altName]) return vesselImageMap[altName];
+        return altName;
+    }
+
+    if (typeof google !== "undefined" && google.script && google.script.run && Object.keys(vesselImageMap).length === 0) {
+        google.script.run.withSuccessHandler(function(map) {
+            if (map) {
+                window.__injectedVesselImages = map;
+                vesselImageMap = map;
+                updateDashboard2();
+            }
+        }).getVesselImageMap();
+    }
+
+    function applyRawData(res) {
+        liveSheetSpecs = {};
+        (res.specs || []).forEach(function(item) { 
+            liveSheetSpecs[item.code] = {
+                code: item.code,
+                name: item.name,
+                mainEngine: item.mainEngine || "--",
+                ge: item.ge || "--",
+                cargoPump: item.cargoPump || "--",
+                pumpOnDeck: item.pumpOnDeck || "--",
+                other: item.other || "[Trống]"
+            }; 
+        });
+
+        globalFleetData = {};
+        for (var code in liveSheetSpecs) {
+            var s = liveSheetSpecs[code];
+            globalFleetData[code] = {
+                code: s.code,
+                name: s.name,
+                img: s.code + ".jpg"
+            };
+        }
+
+        initDashboard2();
+    }
+
+    function fetchAllDataFromGoogleSheets() {
+        var cached = safeGetCache("allsea_fleet_cache");
+        if (cached) {
+            try { applyRawData(JSON.parse(cached)); } catch (e) {}
+        }
+
+        fetch(APPS_SCRIPT_URL, { credentials: "omit" })
+            .then(function(response) { return response.json(); })
+            .then(function(res) {
+                safeSetCache("allsea_fleet_cache", JSON.stringify(res));
+                applyRawData(res);
+            })
+            .catch(function(error) { console.error("Lỗi kết nối Google Sheets:", error); });
+    }
+
+    function initDashboard2() {
+        var select2 = document.getElementById("vesselSelect2");
+        var prevValue = select2.value || safeGetCache("allsea_selected_vessel");
+        select2.innerHTML = "";
+        for (var code in globalFleetData) {
+            var opt = document.createElement("option");
+            opt.value = code;
+            opt.innerText = globalFleetData[code].name;
+            select2.appendChild(opt);
+        }
+        if (prevValue && globalFleetData[prevValue]) {
+            select2.value = prevValue;
+        }
+        updateDashboard2();
+    }
+
+    function updateDashboard2() {
+        var code = document.getElementById("vesselSelect2").value;
+        if (code) safeSetCache("allsea_selected_vessel", code);
+        var data = globalFleetData[code];
+        if (!data) return;
+
+        document.getElementById("bannerVesselName2").innerText = data.name;
+        document.getElementById("vesselImg2").src = resolveVesselImg(data.img);
+
+        var spec = liveSheetSpecs[code] || {};
+        document.getElementById("specMainEngine").innerText = spec.mainEngine;
+        document.getElementById("specGE").innerText = spec.ge;
+        document.getElementById("specCargoPump").innerText = spec.cargoPump;
+        document.getElementById("specPumpOnDeck").innerText = spec.pumpOnDeck;
+        document.getElementById("specOther").innerText = spec.other;
+    }
+
+    fetchAllDataFromGoogleSheets();
+</script>
+</body>
+</html>
+

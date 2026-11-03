@@ -1,0 +1,202 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fleet CII Rating - Allsea Management</title>
+    <style>
+        :root {
+            --primary-color: #1b365d;
+            --secondary-color: #4a777a;
+            --accent-color: #e8f1f5;
+            --border-color: #cbd5e1;
+            --text-main: #1e293b;
+            --bg-body: #f8fafc;
+            --cii-e-bg: #fee2e2;
+            --cii-e-text: #dc2626;
+            --cii-d-bg: #fef3c7;
+            --cii-d-text: #b45309;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-body); color: var(--text-main); padding: 12px; }
+        .container { max-width: 1400px; margin: 0 auto; background: white; padding: 16px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        
+        .nav-tabs { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 2px solid var(--primary-color); padding-bottom: 8px; flex-wrap: wrap; gap: 10px; }
+        .tab-group { display: flex; gap: 6px; flex-wrap: wrap; }
+        .tab-btn { background: #e2e8f0; color: var(--text-main); border: none; padding: 6px 10px; font-size: 11px; font-weight: 700; border-radius: 4px; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; }
+        .tab-btn:hover { background: #cbd5e1; }
+        .tab-btn.active { background: var(--primary-color); color: white; }
+
+        .action-btns { display: flex; gap: 6px; }
+        .action-btn { background: #0d9488; color: white; border: none; padding: 6px 12px; font-size: 11px; font-weight: 700; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s; }
+        .action-btn:hover { background: #0f766e; }
+
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        h1 { font-size: 16px; color: var(--primary-color); font-weight: 700; text-transform: uppercase; }
+
+        .matrix-container { overflow-x: auto; border: 1px solid var(--border-color); border-radius: 6px; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; text-align: center; font-size: 11px; white-space: nowrap; table-layout: fixed; }
+        th, td { border: 1px solid var(--border-color); padding: 5px 2px; overflow: hidden; }
+        tr:nth-child(even) { background-color: #fcfcfc; }
+
+        .cii-table th { background-color: #1b365d; color: white; padding: 8px; font-size: 11px; }
+        .cii-table td { padding: 8px; font-size: 12px; font-weight: 600; }
+        .cii-rating-e { background-color: var(--cii-e-bg); color: var(--cii-e-text); font-weight: 700; }
+        .cii-rating-d { background-color: var(--cii-d-bg); color: var(--cii-d-text); font-weight: 700; }
+        .cii-notes { background: #f8fafc; border: 1px solid var(--border-color); padding: 12px; border-radius: 6px; margin-bottom: 15px; font-size: 12px; line-height: 1.6; }
+
+        .footer-note { margin-top: 12px; font-size: 10px; color: #64748b; text-align: right; }
+
+        @media print {
+            body { background-color: white; padding: 0; }
+            .container { box-shadow: none; padding: 0; max-width: 100%; }
+            .nav-tabs, .action-btns { display: none !important; }
+            table { font-size: 10px; page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="nav-tabs">
+        <div class="tab-group">
+            <a href="vessel-plan.html" onclick="return navigateTab(event, 'vessel-plan.html')" class="tab-btn">📋 Vessel Plan</a>
+            <a href="machinery.html" onclick="return navigateTab(event, 'machinery.html')" class="tab-btn">⚙️ Machinery Specs</a>
+            <a href="tech-visit.html" onclick="return navigateTab(event, 'tech-visit.html')" class="tab-btn">🔍 Tech Visit & Audit</a>
+            <a href="cii-rating.html" onclick="return navigateTab(event, 'cii-rating.html')" class="tab-btn active">🌱 Fleet CII Rating</a>
+            <a href="defect-list.html" onclick="return navigateTab(event, 'defect-list.html')" class="tab-btn">📑 Defect & Repair List</a>
+        </div>
+        <div class="action-btns">
+            <button class="action-btn" onclick="window.print()">🖨️ In / Xuất PDF</button>
+        </div>
+    </div>
+
+    <div id="page4">
+        <header>
+            <h1>FLEET CII RATING & TRACKING (2023 - 2030)</h1>
+        </header>
+
+        <div class="cii-notes">
+            <strong>📌 GHI CHÚ & HƯỚNG DẪN / NOTES & GUIDELINES (MARPOL Annex VI):</strong><br>
+            • <strong>Xếp hạng E (Rating E):</strong> Tàu bắt buộc phải được đánh giá lại và làm lại SEEMP Part II/III | <em>Re-evaluation & SEEMP revision required.</em><br>
+            • <strong>Cảnh báo (Warning):</strong> Nếu tàu đạt hạng D trong 2 năm liên tiếp, hệ thống cảnh báo ở năm tiếp theo | <em>Warning flagged for consecutive D ratings.</em>
+        </div>
+
+        <div class="matrix-container">
+            <table class="cii-table" id="ciiTable">
+                <thead>
+                    <tr>
+                        <th>Năm / Year</th>
+                        <th>GT EQUALITY</th>
+                        <th>GT PEACE</th>
+                        <th>GT VICTORY</th>
+                        <th>LS VENUS</th>
+                        <th>LS JUPITER</th>
+                        <th>GT WIN</th>
+                        <th>LS MERCURY</th>
+                        <th>LS NEPTUNE</th>
+                        <th>LS URANUS</th>
+                    </tr>
+                </thead>
+                <tbody id="ciiTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="footer-note">Allsea Management JSC | Technical Dept (Prepared by: Alber)</div>
+</div>
+
+<script>
+    /*__INJECT_VESSEL_IMAGES__*/
+    window.__allseaMemStore = window.__allseaMemStore || {};
+    function safeGetCache(key) {
+        if (window.__allseaMemStore[key] !== undefined) return window.__allseaMemStore[key];
+        try { return sessionStorage.getItem(key); } catch (e) { return null; }
+    }
+    function safeSetCache(key, val) {
+        window.__allseaMemStore[key] = val;
+        try { sessionStorage.setItem(key, val); } catch (e) {}
+    }
+
+    var liveSheetCII = [];
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzU5kWNkCEfr8EwubNgTK3V4yu1raWS8TfvO224DYCHR2hvTWU7u9BhOTmxadGNfXY/exec";
+    var VESSEL_KEYS = ["GT_EQUALITY", "GT_PEACE", "GT_VICTORY", "LS_VENUS", "LS_JUPITER", "GT_WIN", "LS_MERCURY", "LS_NEPTUNE", "LS_URANUS"];
+
+    function navigateTab(e, pageFile) {
+        if (typeof google !== "undefined" && google.script && google.script.run) {
+            e.preventDefault();
+            google.script.run.withSuccessHandler(function(html) {
+                document.open();
+                document.write(html);
+                document.close();
+            }).getPageContent(pageFile);
+            return false;
+        }
+        return true;
+    }
+
+    function applyRawData(res) {
+        liveSheetCII = res.cii || [];
+        renderCIITable();
+    }
+
+    function fetchAllDataFromGoogleSheets() {
+        var cached = safeGetCache("allsea_fleet_cache");
+        if (cached) {
+            try { applyRawData(JSON.parse(cached)); } catch (e) {}
+        } else {
+            renderCIITable();
+        }
+
+        fetch(APPS_SCRIPT_URL, { credentials: "omit" })
+            .then(function(response) { return response.json(); })
+            .then(function(res) {
+                safeSetCache("allsea_fleet_cache", JSON.stringify(res));
+                applyRawData(res);
+            })
+            .catch(function(error) { console.error("Lỗi kết nối Google Sheets:", error); });
+    }
+
+    function renderCIITable() {
+        var tbody = document.getElementById("ciiTableBody");
+        if (!tbody) return;
+        tbody.innerHTML = "";
+
+        if (!liveSheetCII || liveSheetCII.length === 0) {
+            var trEmpty = document.createElement("tr");
+            var tdEmpty = document.createElement("td");
+            tdEmpty.colSpan = 10;
+            tdEmpty.innerText = "Đang đồng bộ dữ liệu CII từ Google Sheets...";
+            trEmpty.appendChild(tdEmpty);
+            tbody.appendChild(trEmpty);
+            return;
+        }
+
+        liveSheetCII.forEach(function(row) {
+            var tr = document.createElement("tr");
+            var tdYear = document.createElement("td");
+            tdYear.innerText = row.year;
+            tdYear.style.fontWeight = "bold";
+            tdYear.style.backgroundColor = "#f1f5f9";
+            tr.appendChild(tdYear);
+
+            VESSEL_KEYS.forEach(function(vKey) {
+                var td = document.createElement("td");
+                var rating = String(row[vKey] || "").toUpperCase();
+                td.innerText = rating;
+
+                if (rating === "E") {
+                    td.className = "cii-rating-e";
+                } else if (rating === "D") {
+                    td.className = "cii-rating-d";
+                }
+                tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+        });
+    }
+
+    fetchAllDataFromGoogleSheets();
+</script>
+</body>
+</html>
+

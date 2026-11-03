@@ -1,0 +1,615 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vessel Plan - Allsea Management</title>
+    <style>
+        :root {
+            --primary-color: #1b365d;
+            --secondary-color: #4a777a;
+            --accent-color: #e8f1f5;
+            --border-color: #cbd5e1;
+            --text-main: #1e293b;
+            --bg-body: #f8fafc;
+            --highlight-as: #fde68a;
+            --highlight-lsa: #93c5fd;
+            --highlight-dock: #fca5a5;
+            --highlight-is: #cbd5e1;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-body); color: var(--text-main); padding: 12px; }
+        .container { max-width: 1400px; margin: 0 auto; background: white; padding: 16px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        
+        .nav-tabs { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 2px solid var(--primary-color); padding-bottom: 8px; flex-wrap: wrap; gap: 10px; }
+        .tab-group { display: flex; gap: 6px; flex-wrap: wrap; }
+        .tab-btn { background: #e2e8f0; color: var(--text-main); border: none; padding: 6px 10px; font-size: 11px; font-weight: 700; border-radius: 4px; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; }
+        .tab-btn:hover { background: #cbd5e1; }
+        .tab-btn.active { background: var(--primary-color); color: white; }
+
+        .action-btns { display: flex; gap: 6px; }
+        .action-btn { background: #0d9488; color: white; border: none; padding: 6px 12px; font-size: 11px; font-weight: 700; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s; }
+        .action-btn:hover { background: #0f766e; }
+
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        h1 { font-size: 16px; color: var(--primary-color); font-weight: 700; text-transform: uppercase; }
+        
+        .filters-group { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+        .filter-section { display: flex; align-items: center; gap: 6px; }
+        label { font-weight: 600; font-size: 12px; color: var(--primary-color); white-space: nowrap; }
+        select { padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border-color); font-size: 12px; background: white; cursor: pointer; outline: none; min-width: 180px; font-weight: 600; }
+        select:focus { border-color: var(--primary-color); }
+        
+        .top-dashboard { display: grid; grid-template-columns: 280px 1fr; gap: 15px; margin-bottom: 15px; align-items: start; }
+        @media(max-width: 900px) { .top-dashboard { grid-template-columns: 1fr; } }
+        
+        .vessel-profile { background: #fff; border: 1px solid var(--border-color); border-radius: 6px; overflow: hidden; display: flex; flex-direction: column; }
+        .vessel-img-container { width: 100%; height: 180px; background: #e2e8f0; position: relative; overflow: hidden; }
+        .vessel-img-container img { width: 100%; height: 100%; object-fit: cover; }
+        .vessel-name-banner { background: var(--primary-color); color: white; padding: 8px 10px; font-weight: 700; font-size: 14px; text-align: center; }
+
+        .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        @media(max-width: 1100px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media(max-width: 600px) { .cards-grid { grid-template-columns: 1fr; } }
+
+        .info-card { background: #ffffff; border: 1px solid var(--border-color); border-radius: 6px; padding: 10px 12px; display: flex; flex-direction: column; justify-content: center; }
+        .card-label { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; font-weight: 700; }
+        .card-value { font-size: 13px; color: var(--text-main); font-weight: 700; word-break: break-word; }
+
+        .matrix-container { overflow-x: auto; border: 1px solid var(--border-color); border-radius: 6px; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; text-align: center; font-size: 11px; white-space: nowrap; table-layout: fixed; }
+        th, td { border: 1px solid var(--border-color); padding: 5px 2px; overflow: hidden; }
+        th { background-color: var(--primary-color); color: white; font-weight: 600; font-size: 10px; }
+        tr:nth-child(even) { background-color: #fcfcfc; }
+        
+        .plan-name-col { text-align: left; padding-left: 6px; font-weight: 600; background-color: #f1f5f9; width: 85px; min-width: 85px; font-size: 10px; white-space: normal; line-height: 1.1; }
+        
+        .cell-as, .cell-lsa, .cell-is, .cell-dock { font-weight: 600; font-size: 9px; white-space: normal; line-height: 1; }
+        .cell-as { background-color: var(--highlight-as); }
+        .cell-lsa { background-color: var(--highlight-lsa); color: #1e3a8a; }
+        .cell-is { background-color: var(--highlight-is); }
+        .cell-dock { background-color: var(--highlight-dock); }
+
+        .footer-note { margin-top: 12px; font-size: 10px; color: #64748b; text-align: right; }
+
+        @media print {
+            body { background-color: white; padding: 0; }
+            .container { box-shadow: none; padding: 0; max-width: 100%; }
+            .nav-tabs, .filters-group, .action-btns, .vessel-img-container { display: none !important; }
+            table { font-size: 10px; page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="nav-tabs">
+        <div class="tab-group">
+            <a href="vessel-plan.html" onclick="return navigateTab(event, 'vessel-plan.html')" class="tab-btn active">📋 Vessel Plan</a>
+            <a href="machinery.html" onclick="return navigateTab(event, 'machinery.html')" class="tab-btn">⚙️ Machinery Specs</a>
+            <a href="tech-visit.html" onclick="return navigateTab(event, 'tech-visit.html')" class="tab-btn">🔍 Tech Visit & Audit</a>
+            <a href="cii-rating.html" onclick="return navigateTab(event, 'cii-rating.html')" class="tab-btn">🌱 Fleet CII Rating</a>
+            <a href="defect-list.html" onclick="return navigateTab(event, 'defect-list.html')" class="tab-btn">📑 Defect & Repair List</a>
+        </div>
+        <div class="action-btns">
+            <button class="action-btn" onclick="window.print()">🖨️ In / Xuất PDF</button>
+        </div>
+    </div>
+
+    <div id="page1">
+        <header>
+            <h1>ALLSEA MANAGEMENT - VESSEL PLAN</h1>
+            <div class="filters-group">
+                <div class="filter-section">
+                    <label for="timeRangeSelect">Time Range:</label>
+                    <select id="timeRangeSelect" onchange="updateDashboard()">
+                        <optgroup label="Từng Năm">
+                            <option value="1_2026">Năm 2026</option>
+                            <option value="1_2027" selected>Năm 2027</option>
+                            <option value="1_2028">Năm 2028</option>
+                            <option value="1_2029">Năm 2029</option>
+                            <option value="1_2030">Năm 2030</option>
+                        </optgroup>
+                        <optgroup label="Giai Đoạn 2 Năm">
+                            <option value="2_2026-2027">2026 - 2027</option>
+                            <option value="2_2027-2028">2027 - 2028</option>
+                            <option value="2_2028-2029">2028 - 2029</option>
+                            <option value="2_2029-2030">2029 - 2030</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="filter-section">
+                    <label for="vesselSelect">Select Vessel:</label>
+                    <select id="vesselSelect" onchange="updateDashboard()"></select>
+                </div>
+            </div>
+        </header>
+
+        <div class="top-dashboard">
+            <div class="vessel-profile">
+                <div class="vessel-img-container"><img id="vesselImg" src="" alt="Vessel Image" onerror="this.src='https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=600&q=80'"></div>
+                <div class="vessel-name-banner" id="bannerVesselName">--</div>
+            </div>
+            
+            <div class="cards-grid" id="cardsGrid">
+                <div class="info-card"><div class="card-label">IMO Number</div><div class="card-value" id="valIMO">--</div></div>
+                <div class="info-card"><div class="card-label">Call Sign</div><div class="card-value" id="valCallSign">--</div></div>
+                <div class="info-card"><div class="card-label">Class</div><div class="card-value" id="valClass">--</div></div>
+                <div class="info-card"><div class="card-label">Flag</div><div class="card-value" id="valFlag">--</div></div>
+                <div class="info-card" style="grid-column: span 2;"><div class="card-label">Class Notation</div><div class="card-value" id="valNotation" style="font-size: 11px;">--</div></div>
+                <div class="info-card"><div class="card-label">Hull No</div><div class="card-value" id="valHull">--</div></div>
+                <div class="info-card" style="grid-column: span 2;"><div class="card-label">Dimensions</div><div class="card-value" id="valDim" style="font-size: 11px;">--</div></div>
+                <div class="info-card"><div class="card-label">Email</div><div class="card-value" id="valEmail" style="font-size: 10px;">--</div></div>
+                <div class="info-card" style="grid-column: span 2;"><div class="card-label">Launching Date</div><div class="card-value" id="valDate">--</div></div>
+            </div>
+        </div>
+
+        <div class="matrix-container">
+            <table id="matrixTable">
+                <thead>
+                    <tr id="tableHeaderYears"></tr>
+                    <tr id="tableHeaderMonths"></tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="footer-note">Allsea Management JSC | Technical Dept (Prepared by: Alber)</div>
+</div>
+
+<script>
+    /*__INJECT_VESSEL_IMAGES__*/
+    window.__allseaMemStore = window.__allseaMemStore || {};
+    function safeGetCache(key) {
+        if (window.__allseaMemStore[key] !== undefined) return window.__allseaMemStore[key];
+        try { return sessionStorage.getItem(key); } catch (e) { return null; }
+    }
+    function safeSetCache(key, val) {
+        window.__allseaMemStore[key] = val;
+        try { sessionStorage.setItem(key, val); } catch (e) {}
+    }
+
+    var globalFleetData = {};
+    var liveSheetSpecs = {};
+    var liveSheetPlans = {};
+
+    var globalSpecHeaders = [];
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzU5kWNkCEfr8EwubNgTK3V4yu1raWS8TfvO224DYCHR2hvTWU7u9BhOTmxadGNfXY/exec";
+    var STANDARD_PLANS = ["AS", "IS", "SS", "Shaft", "Dock", "Boiler", "LSA & FFA", "UTI", "UTI (2)"];
+    var vesselImageMap = window.__injectedVesselImages || {};
+
+    function navigateTab(e, pageFile) {
+        if (typeof google !== "undefined" && google.script && google.script.run) {
+            e.preventDefault();
+            google.script.run.withSuccessHandler(function(html) {
+                document.open();
+                document.write(html);
+                document.close();
+            }).getPageContent(pageFile);
+            return false;
+        }
+        return true;
+    }
+
+    function resolveVesselImg(fileName) {
+        if (!fileName) return "";
+        if (vesselImageMap[fileName]) return vesselImageMap[fileName];
+        var altName = fileName.replace(/^GT_MG[-_]/i, "MG_").replace(/-/g, "_");
+        if (vesselImageMap[altName]) return vesselImageMap[altName];
+        return altName;
+    }
+
+    if (typeof google !== "undefined" && google.script && google.script.run && Object.keys(vesselImageMap).length === 0) {
+        google.script.run.withSuccessHandler(function(map) {
+            if (map) {
+                window.__injectedVesselImages = map;
+                vesselImageMap = map;
+                updateDashboard();
+            }
+        }).getVesselImageMap();
+    }
+
+        var KNOWN_IMO_MAP = {
+        "GT_EQUALITY": "9205512",
+        "GT_PEACE": "9321639",
+        "GT_VICTORY": "9321641",
+        "GT_WIN": "9341354",
+        "LS_JUPITER": "9531595",
+        "LS_MERCURY": "9657507",
+        "LS_NEPTUNE": "9337339",
+        "LS_URANUS": "9380736",
+        "LS_VENUS": "9332420",
+        "MG_01": "9684184",
+        "MG_02": "9684196",
+        "MG_03": "9684201",
+        "MG-01": "9684184",
+        "MG-02": "9684196",
+        "MG-03": "9684201"
+    };
+
+    function formatSpecDate(raw) {
+        if (!raw) return "--";
+        var s = String(raw).trim();
+        if (s.includes("T")) {
+            var d = new Date(s);
+            if (!isNaN(d.getTime())) {
+                var day = ("0" + d.getDate()).slice(-2);
+                var month = ("0" + (d.getMonth() + 1)).slice(-2);
+                var year = d.getFullYear();
+                return day + "-" + month + "-" + year;
+            }
+        }
+        return s;
+    }
+
+    function applyRawData(res) {
+        if (res.specHeaders && Array.isArray(res.specHeaders) && res.specHeaders.length > 0) {
+            globalSpecHeaders = res.specHeaders;
+        } else {
+            globalSpecHeaders = ["IMO", "Call Sign", "Class", "Flag", "Class Notation", "Hull No", "Dimensions", "Email", "Launching Date"];
+        }
+
+        liveSheetSpecs = {};
+        (res.specs || []).forEach(function(item) {
+            var normCode = String(item.code || "").toUpperCase().replace(/\s+/g, "_");
+            
+            // Tự động nhận diện nếu API trả về dữ liệu bị lệch 1 cột (do Apps Script cũ lấy từ index 8 thay vì 7)
+            // Dấu hiệu nhận biết chắc chắn 100%: item.dim chứa '@' (thực chất là Email) hoặc item.email chứa ngày tháng
+            var isShifted = (!item.dynamicSpecs || item.dynamicSpecs.length === 0) && (
+                (item.dim && String(item.dim).includes("@")) ||
+                (item.email && String(item.email).includes("Z")) ||
+                (item.callSign && (item.callSign === "NK-VR" || item.callSign === "KR" || item.callSign === "VR/KR" || item.callSign === "BV" || item.callSign === "VR"))
+            );
+
+            var finalIMO, finalCallSign, finalCls, finalFlag, finalNotation, finalHull, finalDim, finalEmail, finalDate;
+            var dynamicList = [];
+
+            if (item.dynamicSpecs && item.dynamicSpecs.length > 0) {
+                // Đã có dynamicSpecs từ Google Apps Script phiên bản chuẩn
+                dynamicList = item.dynamicSpecs.map(function(f) {
+                    var val = f.value;
+                    if (f.label && f.label.toLowerCase().includes("date")) val = formatSpecDate(val);
+                    return { label: f.label, value: val };
+                });
+                finalIMO = item.imo || (dynamicList[0] ? dynamicList[0].value : "N/A");
+                finalCallSign = item.callSign || (dynamicList[1] ? dynamicList[1].value : "N/A");
+                finalCls = item.cls || (dynamicList[2] ? dynamicList[2].value : "N/A");
+                finalFlag = item.flag || (dynamicList[3] ? dynamicList[3].value : "N/A");
+                finalNotation = item.notation || (dynamicList[4] ? dynamicList[4].value : "N/A");
+                finalHull = item.hull || (dynamicList[5] ? dynamicList[5].value : "N/A");
+                finalDim = item.dim || (dynamicList[6] ? dynamicList[6].value : "N/A");
+                finalEmail = item.email || (dynamicList[7] ? dynamicList[7].value : "N/A");
+                finalDate = formatSpecDate(item.date || (dynamicList[8] ? dynamicList[8].value : "N/A"));
+            } else if (isShifted) {
+                // Tự động căn chỉnh lại đúng 100% theo các cột H -> P của Google Sheet:
+                // Cột H (index 7): IMO (lấy từ bảng tra cứu số IMO chuẩn)
+                finalIMO = KNOWN_IMO_MAP[normCode] || KNOWN_IMO_MAP[normCode.replace("GT_", "").replace("LS_", "")] || item.imo || "N/A";
+                // Cột I (index 8): Call Sign (bị gán nhầm vào item.imo)
+                finalCallSign = item.imo || "N/A";
+                // Cột J (index 9): Class (bị gán nhầm vào item.callSign)
+                finalCls = item.callSign || "N/A";
+                // Cột K (index 10): Flag (bị gán nhầm vào item.cls)
+                finalFlag = item.cls || "N/A";
+                // Cột L (index 11): Class Notation (bị gán nhầm vào item.flag)
+                finalNotation = item.flag || "N/A";
+                // Cột M (index 12): Hull No (bị gán nhầm vào item.notation)
+                finalHull = item.notation || "N/A";
+                // Cột N (index 13): Dimensions (bị gán nhầm vào item.hull)
+                finalDim = item.hull || "N/A";
+                // Cột O (index 14): Email (bị gán nhầm vào item.dim)
+                finalEmail = item.dim || "N/A";
+                // Cột P (index 15): Launching Date (bị gán nhầm vào item.email)
+                finalDate = formatSpecDate(item.email);
+
+                dynamicList = [
+                    { label: "IMO", value: finalIMO },
+                    { label: "Call Sign", value: finalCallSign },
+                    { label: "Class", value: finalCls },
+                    { label: "Flag", value: finalFlag },
+                    { label: "Class Notation", value: finalNotation },
+                    { label: "Hull No", value: finalHull },
+                    { label: "Dimensions", value: finalDim },
+                    { label: "Email", value: finalEmail },
+                    { label: "Launching Date", value: finalDate }
+                ];
+            } else {
+                finalIMO = item.imo || "N/A";
+                finalCallSign = item.callSign || "N/A";
+                finalCls = item.cls || "N/A";
+                finalFlag = item.flag || "N/A";
+                finalNotation = item.notation || "N/A";
+                finalHull = item.hull || "N/A";
+                finalDim = item.dim || "N/A";
+                finalEmail = item.email || "N/A";
+                finalDate = formatSpecDate(item.date);
+                dynamicList = [
+                    { label: globalSpecHeaders[0] || "IMO", value: finalIMO },
+                    { label: globalSpecHeaders[1] || "Call Sign", value: finalCallSign },
+                    { label: globalSpecHeaders[2] || "Class", value: finalCls },
+                    { label: globalSpecHeaders[3] || "Flag", value: finalFlag },
+                    { label: globalSpecHeaders[4] || "Class Notation", value: finalNotation },
+                    { label: globalSpecHeaders[5] || "Hull No", value: finalHull },
+                    { label: globalSpecHeaders[6] || "Dimensions", value: finalDim },
+                    { label: globalSpecHeaders[7] || "Email", value: finalEmail },
+                    { label: globalSpecHeaders[8] || "Launching Date", value: finalDate }
+                ];
+            }
+
+            liveSheetSpecs[item.code] = {
+                code: item.code,
+                name: item.name,
+                dynamicSpecs: dynamicList,
+                imo: finalIMO,
+                callSign: finalCallSign,
+                cls: finalCls,
+                flag: finalFlag,
+                notation: finalNotation,
+                hull: finalHull,
+                dim: finalDim,
+                email: finalEmail,
+                date: finalDate
+            }; 
+        });
+
+        liveSheetPlans = {};
+        if (res.plans) {
+            for (var code in res.plans) {
+                var rawPlans = res.plans[code];
+                var processedPlans = [];
+                rawPlans.forEach(function(p) {
+                    if (!p.fromDate || !p.toDate) return;
+                    var fDate = new Date(p.fromDate);
+                    var tDate = new Date(p.toDate);
+                    var fIdx = (fDate.getFullYear() - 2026) * 12 + fDate.getMonth();
+                    var tIdx = (tDate.getFullYear() - 2026) * 12 + tDate.getMonth();
+                    var indices = [];
+                    for (var idx = fIdx; idx <= tIdx; idx++) indices.push(idx);
+
+                    var pNameUpper = p.name.toUpperCase();
+                    var type = 'is';
+                    if (pNameUpper.includes('AS') || pNameUpper.includes('UTI')) type = 'as';
+                    else if (pNameUpper.includes('LSA')) type = 'lsa';
+                    else if (pNameUpper.includes('DOCK')) type = 'dock';
+
+                    processedPlans.push({
+                        name: p.name,
+                        type: type,
+                        indices: indices,
+                        label: p.name + " (" + fDate.getDate() + ")",
+                        endLabel: p.name + " (" + tDate.getDate() + ")"
+                    });
+                });
+                liveSheetPlans[code] = processedPlans;
+            }
+        }
+
+        globalFleetData = {};
+        for (var code in liveSheetSpecs) {
+            var s = liveSheetSpecs[code];
+            var matchedPlans = liveSheetPlans[s.code] || liveSheetPlans[s.code.replace("MERCURY", "MECURY")] || [];
+            globalFleetData[code] = {
+                code: s.code,
+                name: s.name,
+                dynamicSpecs: s.dynamicSpecs || [],
+                imo: s.imo,
+                callSign: s.callSign,
+                cls: s.cls,
+                flag: s.flag,
+                notation: s.notation,
+                hull: s.hull,
+                dim: s.dim,
+                email: s.email,
+                date: s.date,
+                img: s.code + ".jpg",
+                plans: matchedPlans
+            };
+        }
+
+        initDashboard();
+    }
+
+    function fetchAllDataFromGoogleSheets() {
+        var cached = safeGetCache("allsea_fleet_cache");
+        if (cached) {
+            try { applyRawData(JSON.parse(cached)); } catch (e) {}
+        }
+
+        fetch(APPS_SCRIPT_URL, { credentials: "omit" })
+            .then(function(response) { return response.json(); })
+            .then(function(res) {
+                safeSetCache("allsea_fleet_cache", JSON.stringify(res));
+                applyRawData(res);
+            })
+            .catch(function(error) { console.error("Lỗi kết nối Google Sheets:", error); });
+    }
+
+    function initDashboard() {
+        var select = document.getElementById("vesselSelect");
+        var prevValue = select.value || safeGetCache("allsea_selected_vessel");
+        select.innerHTML = "";
+        for (var code in globalFleetData) {
+            var opt = document.createElement("option");
+            opt.value = code;
+            opt.innerText = globalFleetData[code].name;
+            select.appendChild(opt);
+        }
+        if (prevValue && globalFleetData[prevValue]) {
+            select.value = prevValue;
+        }
+        updateDashboard();
+    }
+
+
+    function renderDynamicCardsGrid(data) {
+        var grid = document.getElementById("cardsGrid");
+        if (!grid || !data) return;
+
+        // Ưu tiên nạp danh sách nhãn & giá trị động từ H1 -> P1
+        var fields = data.dynamicSpecs;
+        if (!fields || !fields.length) {
+            var fallbackLabels = (globalSpecHeaders && globalSpecHeaders.length) ? globalSpecHeaders : [
+                "IMO Number", "Call Sign", "Class", "Flag",
+                "Class Notation", "Hull No", "Dimensions", "Email", "Launching Date"
+            ];
+            var fallbackValues = [
+                data.imo, data.callSign, data.cls, data.flag,
+                data.notation, data.hull, data.dim, data.email, data.date
+            ];
+            fields = fallbackLabels.map(function(lbl, idx) {
+                return { label: lbl, value: fallbackValues[idx] || "--" };
+            });
+        }
+
+        grid.innerHTML = "";
+        fields.forEach(function(f, idx) {
+            var card = document.createElement("div");
+            card.className = "info-card";
+            var valStr = (f.value !== undefined && f.value !== null && String(f.value).trim() !== "") ? String(f.value).trim() : "--";
+
+            // Trường dài cho span 2 cột
+            if (idx === 4 || idx === 6 || idx === 8 || valStr.length > 25) {
+                card.style.gridColumn = "span 2";
+            }
+
+            var lblDiv = document.createElement("div");
+            lblDiv.className = "card-label";
+            lblDiv.innerText = f.label || ("Field " + (idx + 1));
+
+            var valDiv = document.createElement("div");
+            valDiv.className = "card-value";
+            valDiv.innerText = valStr;
+            if (valStr.length > 25) {
+                valDiv.style.fontSize = "11px";
+            } else if (valStr.includes("@")) {
+                valDiv.style.fontSize = "10px";
+            }
+
+            card.appendChild(lblDiv);
+            card.appendChild(valDiv);
+            grid.appendChild(card);
+        });
+    }
+
+    function updateDashboard() {
+        var code = document.getElementById("vesselSelect").value;
+        if (code) safeSetCache("allsea_selected_vessel", code);
+        var val = document.getElementById("timeRangeSelect").value;
+        var parts = val.split("_");
+        var mode = parts[0];
+        var param = parts[1];
+        var data = globalFleetData[code];
+        if (!data) return;
+
+        document.getElementById("bannerVesselName").innerText = data.name;
+        document.getElementById("vesselImg").src = resolveVesselImg(data.img);
+        renderDynamicCardsGrid(data);
+
+        if (mode === "1") {
+            var year = parseInt(param, 10);
+            renderMatrixHeaders1Year("tableHeaderYears", "tableHeaderMonths", year);
+            renderMatrixBody1Year(data.plans, year);
+        } else {
+            var yParts = param.split("-").map(Number);
+            renderMatrixHeaders2Years("tableHeaderYears", "tableHeaderMonths", yParts[0], yParts[1]);
+            renderMatrixBody2Years(data.plans, yParts[0]);
+        }
+    }
+
+    function renderMatrixHeaders1Year(yearId, monthId, year) {
+        document.getElementById(yearId).innerHTML = 
+            '<th rowspan="2" style="width: 85px; vertical-align: middle;">INSPECTION</th><th colspan="12">' + year + '</th>';
+        var monthsHtml = "";
+        for (var m = 1; m <= 12; m++) monthsHtml += '<th>T' + m + '</th>';
+        document.getElementById(monthId).innerHTML = monthsHtml;
+    }
+
+    function renderMatrixHeaders2Years(yearId, monthId, y1, y2) {
+        document.getElementById(yearId).innerHTML = 
+            '<th rowspan="2" style="width: 85px; vertical-align: middle;">INSPECTION</th><th colspan="12">' + y1 + '</th><th colspan="12">' + y2 + '</th>';
+        var monthsHtml = "";
+        for (var m = 1; m <= 12; m++) monthsHtml += '<th>T' + m + '</th>';
+        for (var m2 = 1; m2 <= 12; m2++) monthsHtml += '<th>T' + m2 + '</th>';
+        document.getElementById(monthId).innerHTML = monthsHtml;
+    }
+
+    function renderMatrixBody1Year(vesselPlans, year) {
+        var tbody = document.getElementById("tableBody");
+        tbody.innerHTML = "";
+        var baseIndex = (year - 2026) * 12;
+        var planMap = {};
+        if (vesselPlans) {
+            vesselPlans.forEach(function(p) { planMap[p.name.trim().toUpperCase().replace(/\s+/g, '')] = p; });
+        }
+        STANDARD_PLANS.forEach(function(stdName) {
+            var tr = document.createElement("tr");
+            var tdName = document.createElement("td");
+            tdName.className = "plan-name-col";
+            tdName.innerText = stdName;
+            tr.appendChild(tdName);
+
+            var matchedPlan = planMap[stdName.trim().toUpperCase().replace(/\s+/g, '')];
+            for (var i = 0; i < 12; i++) {
+                var absoluteIndex = baseIndex + i;
+                var td = document.createElement("td");
+                if (matchedPlan && matchedPlan.indices && matchedPlan.indices.includes(absoluteIndex)) {
+                    var firstIdx = matchedPlan.indices[0];
+                    var lastIdx = matchedPlan.indices[matchedPlan.indices.length - 1];
+                    if (absoluteIndex === firstIdx && matchedPlan.label) td.innerText = matchedPlan.label;
+                    else if (absoluteIndex === lastIdx && matchedPlan.endLabel && lastIdx !== firstIdx) td.innerText = matchedPlan.endLabel;
+                    else td.innerText = stdName === "LSA & FFA" ? "LSA\nFFA" : stdName;
+
+                    var type = matchedPlan.type;
+                    if (type === 'as') td.className = "cell-as";
+                    else if (type === 'lsa') td.className = "cell-lsa";
+                    else if (type === 'dock') td.className = "cell-dock";
+                    else td.className = "cell-is";
+                }
+                tr.appendChild(td);
+            }
+            tbody.appendChild(tr);
+        });
+    }
+
+    function renderMatrixBody2Years(vesselPlans, startYear) {
+        var tbody = document.getElementById("tableBody");
+        tbody.innerHTML = "";
+        var baseIndex = (startYear - 2026) * 12;
+        var planMap = {};
+        if (vesselPlans) {
+            vesselPlans.forEach(function(p) { planMap[p.name.trim().toUpperCase().replace(/\s+/g, '')] = p; });
+        }
+        STANDARD_PLANS.forEach(function(stdName) {
+            var tr = document.createElement("tr");
+            var tdName = document.createElement("td");
+            tdName.className = "plan-name-col";
+            tdName.innerText = stdName;
+            tr.appendChild(tdName);
+
+            var matchedPlan = planMap[stdName.trim().toUpperCase().replace(/\s+/g, '')];
+            for (var i = 0; i < 24; i++) {
+                var absoluteIndex = baseIndex + i;
+                var td = document.createElement("td");
+                if (matchedPlan && matchedPlan.indices && matchedPlan.indices.includes(absoluteIndex)) {
+                    var firstIdx = matchedPlan.indices[0];
+                    var lastIdx = matchedPlan.indices[matchedPlan.indices.length - 1];
+                    if (absoluteIndex === firstIdx && matchedPlan.label) td.innerText = matchedPlan.label;
+                    else if (absoluteIndex === lastIdx && matchedPlan.endLabel && lastIdx !== firstIdx) td.innerText = matchedPlan.endLabel;
+                    else td.innerText = stdName === "LSA & FFA" ? "LSA\nFFA" : stdName;
+
+                    var type = matchedPlan.type;
+                    if (type === 'as') td.className = "cell-as";
+                    else if (type === 'lsa') td.className = "cell-lsa";
+                    else if (type === 'dock') td.className = "cell-dock";
+                    else td.className = "cell-is";
+                }
+                tr.appendChild(td);
+            }
+            tbody.appendChild(tr);
+        });
+    }
+
+    fetchAllDataFromGoogleSheets();
+</script>
+</body>
+</html>
+

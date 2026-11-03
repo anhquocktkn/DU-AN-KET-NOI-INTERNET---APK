@@ -1,0 +1,436 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Visit & Audit - Allsea Management</title>
+    <style>
+        :root {
+            --primary-color: #1b365d;
+            --secondary-color: #4a777a;
+            --accent-color: #e8f1f5;
+            --border-color: #cbd5e1;
+            --text-main: #1e293b;
+            --bg-body: #f8fafc;
+            --alert-tech: #fde047;
+            --alert-audit: #fdba74;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-body); color: var(--text-main); padding: 12px; }
+        .container { max-width: 1400px; margin: 0 auto; background: white; padding: 16px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        
+        .nav-tabs { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 2px solid var(--primary-color); padding-bottom: 8px; flex-wrap: wrap; gap: 10px; }
+        .tab-group { display: flex; gap: 6px; flex-wrap: wrap; }
+        .tab-btn { background: #e2e8f0; color: var(--text-main); border: none; padding: 6px 10px; font-size: 11px; font-weight: 700; border-radius: 4px; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; }
+        .tab-btn:hover { background: #cbd5e1; }
+        .tab-btn.active { background: var(--primary-color); color: white; }
+
+        .action-btns { display: flex; gap: 6px; }
+        .action-btn { background: #0d9488; color: white; border: none; padding: 6px 12px; font-size: 11px; font-weight: 700; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s; }
+        .action-btn:hover { background: #0f766e; }
+
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        h1 { font-size: 16px; color: var(--primary-color); font-weight: 700; text-transform: uppercase; }
+        
+        .filters-group { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+        .filter-section { display: flex; align-items: center; gap: 6px; }
+        label { font-weight: 600; font-size: 12px; color: var(--primary-color); white-space: nowrap; }
+        select { padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border-color); font-size: 12px; background: white; cursor: pointer; outline: none; min-width: 180px; font-weight: 600; }
+        select:focus { border-color: var(--primary-color); }
+        
+        .top-dashboard { display: grid; grid-template-columns: 280px 1fr; gap: 15px; margin-bottom: 15px; align-items: start; }
+        @media(max-width: 900px) { .top-dashboard { grid-template-columns: 1fr; } }
+        
+        .vessel-profile { background: #fff; border: 1px solid var(--border-color); border-radius: 6px; overflow: hidden; display: flex; flex-direction: column; }
+        .vessel-img-container { width: 100%; height: 180px; background: #e2e8f0; position: relative; overflow: hidden; }
+        .vessel-img-container img { width: 100%; height: 100%; object-fit: cover; }
+        .vessel-name-banner { background: var(--primary-color); color: white; padding: 8px 10px; font-weight: 700; font-size: 14px; text-align: center; }
+
+        .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        @media(max-width: 1100px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media(max-width: 600px) { .cards-grid { grid-template-columns: 1fr; } }
+
+        .info-card { background: #ffffff; border: 1px solid var(--border-color); border-radius: 6px; padding: 10px 12px; display: flex; flex-direction: column; justify-content: center; }
+        .card-label { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; font-weight: 700; }
+        .card-value { font-size: 13px; color: var(--text-main); font-weight: 700; word-break: break-word; }
+
+        .matrix-container { overflow-x: auto; border: 1px solid var(--border-color); border-radius: 6px; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; text-align: center; font-size: 11px; white-space: nowrap; table-layout: fixed; }
+        th, td { border: 1px solid var(--border-color); padding: 5px 2px; overflow: hidden; }
+        th { background-color: var(--primary-color); color: white; font-weight: 600; font-size: 10px; }
+        tr:nth-child(even) { background-color: #fcfcfc; }
+        
+        .plan-name-col { text-align: left; padding-left: 6px; font-weight: 600; background-color: #f1f5f9; width: 85px; min-width: 85px; font-size: 10px; white-space: normal; line-height: 1.1; }
+        
+        .cell-tech-visit { background-color: #bae6fd; font-weight: 600; font-size: 9px; white-space: normal; line-height: 1.1; }
+        .cell-engine-audit { background-color: #e2e8f0; font-weight: 600; font-size: 9px; white-space: normal; line-height: 1.1; }
+        .cell-need-tech { background-color: var(--alert-tech); font-weight: 700; color: #854d0e; font-size: 9px; white-space: normal; line-height: 1.1; }
+        .cell-need-audit { background-color: var(--alert-audit); font-weight: 700; color: #9a3412; font-size: 9px; white-space: normal; line-height: 1.1; }
+
+        .footer-note { margin-top: 12px; font-size: 10px; color: #64748b; text-align: right; }
+
+        @media print {
+            body { background-color: white; padding: 0; }
+            .container { box-shadow: none; padding: 0; max-width: 100%; }
+            .nav-tabs, .filters-group, .action-btns, .vessel-img-container { display: none !important; }
+            table { font-size: 10px; page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="nav-tabs">
+        <div class="tab-group">
+            <a href="vessel-plan.html" onclick="return navigateTab(event, 'vessel-plan.html')" class="tab-btn">📋 Vessel Plan</a>
+            <a href="machinery.html" onclick="return navigateTab(event, 'machinery.html')" class="tab-btn">⚙️ Machinery Specs</a>
+            <a href="tech-visit.html" onclick="return navigateTab(event, 'tech-visit.html')" class="tab-btn active">🔍 Tech Visit & Audit</a>
+            <a href="cii-rating.html" onclick="return navigateTab(event, 'cii-rating.html')" class="tab-btn">🌱 Fleet CII Rating</a>
+            <a href="defect-list.html" onclick="return navigateTab(event, 'defect-list.html')" class="tab-btn">📑 Defect & Repair List</a>
+        </div>
+        <div class="action-btns">
+            <button class="action-btn" onclick="window.print()">🖨️ In / Xuất PDF</button>
+        </div>
+    </div>
+
+    <div id="page3">
+        <header>
+            <h1>SUPT TECH VISIT & AUDIT TRACKING</h1>
+            <div class="filters-group">
+                <div class="filter-section">
+                    <label for="timeRangeSelect3">Time Range:</label>
+                    <select id="timeRangeSelect3" onchange="updateDashboard3()">
+                        <optgroup label="Từng Năm">
+                            <option value="1_2026">Năm 2026</option>
+                            <option value="1_2027" selected>Năm 2027</option>
+                            <option value="1_2028">Năm 2028</option>
+                            <option value="1_2029">Năm 2029</option>
+                            <option value="1_2030">Năm 2030</option>
+                        </optgroup>
+                        <optgroup label="Giai Đoạn 2 Năm">
+                            <option value="2_2026-2027">2026 - 2027</option>
+                            <option value="2_2027-2028">2027 - 2028</option>
+                            <option value="2_2028-2029">2028 - 2029</option>
+                            <option value="2_2029-2030">2029 - 2030</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="filter-section">
+                    <label for="vesselSelect3">Select Vessel:</label>
+                    <select id="vesselSelect3" onchange="updateDashboard3()"></select>
+                </div>
+            </div>
+        </header>
+
+        <div class="top-dashboard">
+            <div class="vessel-profile">
+                <div class="vessel-img-container"><img id="vesselImg3" src="" alt="Vessel Image" onerror="this.src='https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=600&q=80'"></div>
+                <div class="vessel-name-banner" id="bannerVesselName3">--</div>
+            </div>
+            
+            <div class="cards-grid">
+                <div class="info-card"><div class="card-label">IMO Number</div><div class="card-value" id="valIMO3">--</div></div>
+                <div class="info-card"><div class="card-label">Call Sign</div><div class="card-value" id="valCallSign3">--</div></div>
+                <div class="info-card"><div class="card-label">Class</div><div class="card-value" id="valClass3">--</div></div>
+                <div class="info-card"><div class="card-label">Flag</div><div class="card-value" id="valFlag3">--</div></div>
+                <div class="info-card" style="grid-column: span 2;"><div class="card-label">Class Notation</div><div class="card-value" id="valNotation3" style="font-size: 11px;">--</div></div>
+                <div class="info-card"><div class="card-label">Hull No</div><div class="card-value" id="valHull3">--</div></div>
+            </div>
+        </div>
+
+        <div class="matrix-container">
+            <table id="matrixTable3">
+                <thead>
+                    <tr id="tableHeaderYears3"></tr>
+                    <tr id="tableHeaderMonths3"></tr>
+                </thead>
+                <tbody id="tableBody3"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="footer-note">Allsea Management JSC | Technical Dept (Prepared by: Alber)</div>
+</div>
+
+<script>
+    /*__INJECT_VESSEL_IMAGES__*/
+    window.__allseaMemStore = window.__allseaMemStore || {};
+    function safeGetCache(key) {
+        if (window.__allseaMemStore[key] !== undefined) return window.__allseaMemStore[key];
+        try { return sessionStorage.getItem(key); } catch (e) { return null; }
+    }
+    function safeSetCache(key, val) {
+        window.__allseaMemStore[key] = val;
+        try { sessionStorage.setItem(key, val); } catch (e) {}
+    }
+
+    var globalFleetData = {};
+    var liveSheetSpecs = {};
+    var liveSheetTechVisits = {};
+
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzU5kWNkCEfr8EwubNgTK3V4yu1raWS8TfvO224DYCHR2hvTWU7u9BhOTmxadGNfXY/exec";
+    var vesselImageMap = window.__injectedVesselImages || {};
+
+    function navigateTab(e, pageFile) {
+        if (typeof google !== "undefined" && google.script && google.script.run) {
+            e.preventDefault();
+            google.script.run.withSuccessHandler(function(html) {
+                document.open();
+                document.write(html);
+                document.close();
+            }).getPageContent(pageFile);
+            return false;
+        }
+        return true;
+    }
+
+    function resolveVesselImg(fileName) {
+        if (!fileName) return "";
+        if (vesselImageMap[fileName]) return vesselImageMap[fileName];
+        var altName = fileName.replace(/^GT_MG[-_]/i, "MG_").replace(/-/g, "_");
+        if (vesselImageMap[altName]) return vesselImageMap[altName];
+        return altName;
+    }
+
+    if (typeof google !== "undefined" && google.script && google.script.run && Object.keys(vesselImageMap).length === 0) {
+        google.script.run.withSuccessHandler(function(map) {
+            if (map) {
+                window.__injectedVesselImages = map;
+                vesselImageMap = map;
+                updateDashboard3();
+            }
+        }).getVesselImageMap();
+    }
+
+    function applyRawData(res) {
+        liveSheetSpecs = {};
+        (res.specs || []).forEach(function(item) { 
+            liveSheetSpecs[item.code] = {
+                code: item.code,
+                name: item.name,
+                imo: item.imo || "N/A",
+                callSign: item.callSign || "N/A",
+                cls: item.cls || "N/A",
+                flag: item.flag || "N/A",
+                notation: item.notation || "N/A",
+                hull: item.hull || "N/A"
+            }; 
+        });
+
+        liveSheetTechVisits = res.techVisits || {};
+
+        globalFleetData = {};
+        for (var code in liveSheetSpecs) {
+            var s = liveSheetSpecs[code];
+            globalFleetData[code] = {
+                code: s.code,
+                name: s.name,
+                imo: s.imo,
+                callSign: s.callSign,
+                cls: s.cls,
+                flag: s.flag,
+                notation: s.notation,
+                hull: s.hull,
+                img: s.code + ".jpg"
+            };
+        }
+
+        initDashboard3();
+    }
+
+    function fetchAllDataFromGoogleSheets() {
+        var cached = safeGetCache("allsea_fleet_cache");
+        if (cached) {
+            try { applyRawData(JSON.parse(cached)); } catch (e) {}
+        }
+
+        fetch(APPS_SCRIPT_URL, { credentials: "omit" })
+            .then(function(response) { return response.json(); })
+            .then(function(res) {
+                safeSetCache("allsea_fleet_cache", JSON.stringify(res));
+                applyRawData(res);
+            })
+            .catch(function(error) { console.error("Lỗi kết nối Google Sheets:", error); });
+    }
+
+    function initDashboard3() {
+        var select3 = document.getElementById("vesselSelect3");
+        var prevValue = select3.value || safeGetCache("allsea_selected_vessel");
+        select3.innerHTML = "";
+        for (var code in globalFleetData) {
+            var opt = document.createElement("option");
+            opt.value = code;
+            opt.innerText = globalFleetData[code].name;
+            select3.appendChild(opt);
+        }
+        if (prevValue && globalFleetData[prevValue]) {
+            select3.value = prevValue;
+        }
+        updateDashboard3();
+    }
+
+    function updateDashboard3() {
+        var code = document.getElementById("vesselSelect3").value;
+        if (code) safeSetCache("allsea_selected_vessel", code);
+        var val = document.getElementById("timeRangeSelect3").value;
+        var parts = val.split("_");
+        var mode = parts[0];
+        var param = parts[1];
+        var data = globalFleetData[code];
+        if (!data) return;
+
+        document.getElementById("bannerVesselName3").innerText = data.name;
+        document.getElementById("valIMO3").innerText = data.imo;
+        document.getElementById("valCallSign3").innerText = data.callSign;
+        document.getElementById("valClass3").innerText = data.cls;
+        document.getElementById("valFlag3").innerText = data.flag;
+        document.getElementById("valNotation3").innerText = data.notation;
+        document.getElementById("valHull3").innerText = data.hull;
+        document.getElementById("vesselImg3").src = resolveVesselImg(data.img);
+
+        var visits = liveSheetTechVisits[code] || [];
+
+        if (mode === "1") {
+            var year = parseInt(param, 10);
+            renderMatrixHeaders1Year("tableHeaderYears3", "tableHeaderMonths3", year);
+            renderTechVisitMatrixBody1Year(visits, year);
+        } else {
+            var yParts = param.split("-").map(Number);
+            renderMatrixHeaders2Years("tableHeaderYears3", "tableHeaderMonths3", yParts[0], yParts[1]);
+            renderTechVisitMatrixBody2Years(visits, yParts[0]);
+        }
+    }
+
+    function renderMatrixHeaders1Year(yearId, monthId, year) {
+        document.getElementById(yearId).innerHTML = 
+            '<th rowspan="2" style="width: 85px; vertical-align: middle;">INSPECTION</th><th colspan="12">' + year + '</th>';
+        var monthsHtml = "";
+        for (var m = 1; m <= 12; m++) monthsHtml += '<th>T' + m + '</th>';
+        document.getElementById(monthId).innerHTML = monthsHtml;
+    }
+
+    function renderMatrixHeaders2Years(yearId, monthId, y1, y2) {
+        document.getElementById(yearId).innerHTML = 
+            '<th rowspan="2" style="width: 85px; vertical-align: middle;">INSPECTION</th><th colspan="12">' + y1 + '</th><th colspan="12">' + y2 + '</th>';
+        var monthsHtml = "";
+        for (var m = 1; m <= 12; m++) monthsHtml += '<th>T' + m + '</th>';
+        for (var m2 = 1; m2 <= 12; m2++) monthsHtml += '<th>T' + m2 + '</th>';
+        document.getElementById(monthId).innerHTML = monthsHtml;
+    }
+
+    function buildTechVisitAndAuditRows(visits) {
+        var techList = [];
+        var auditList = [];
+
+        (visits || []).forEach(function(v) {
+            if (!v.fromDate || !v.toDate || !v.type) return;
+            var fDate = new Date(v.fromDate);
+            var tDate = new Date(v.toDate);
+            if (isNaN(fDate.getTime()) || isNaN(tDate.getTime())) return;
+
+            var vType = v.type.toLowerCase();
+            var fIdx = (fDate.getFullYear() - 2026) * 12 + fDate.getMonth();
+            var tIdx = (tDate.getFullYear() - 2026) * 12 + tDate.getMonth();
+            var label = (v.inspector || "Supt") + " (" + fDate.getDate() + "-" + tDate.getDate() + "/" + (tDate.getMonth() + 1) + ")";
+
+            var entry = { fDate: fDate, tDate: tDate, fIdx: fIdx, tIdx: tIdx, label: label };
+            if (vType.includes("tech")) {
+                techList.push(entry);
+            } else if (vType.includes("engine") || vType.includes("audit")) {
+                auditList.push(entry);
+            }
+        });
+
+        techList.sort(function(a, b) { return a.fDate - b.fDate || a.tDate - b.tDate; });
+        auditList.sort(function(a, b) { return a.fDate - b.fDate || a.tDate - b.tDate; });
+
+        var techVisitIndices = {};
+        var needTechIndices = {};
+        var engineAuditIndices = {};
+        var needAuditIndices = {};
+
+        for (var i = 0; i < techList.length; i++) {
+            var cur = techList[i];
+            var next = (i + 1 < techList.length) ? techList[i + 1] : null;
+            var endSpan = cur.tIdx + 6;
+            if (next && next.fIdx <= endSpan) {
+                endSpan = next.fIdx - 1;
+            }
+            for (var m = cur.fIdx; m <= endSpan; m++) {
+                if (m >= cur.fIdx && m <= cur.tIdx) {
+                    techVisitIndices[m] = { active: true, text: cur.label };
+                } else if (!techVisitIndices[m] || !techVisitIndices[m].text) {
+                    techVisitIndices[m] = { active: true, text: "" };
+                }
+            }
+            if (!next) {
+                needTechIndices[cur.tIdx + 6] = { active: true, text: "Need Tech Visit" };
+            }
+        }
+
+        for (var j = 0; j < auditList.length; j++) {
+            var curA = auditList[j];
+            var nextA = (j + 1 < auditList.length) ? auditList[j + 1] : null;
+            var endSpanA = curA.tIdx + 12;
+            if (nextA && nextA.fIdx <= endSpanA) {
+                endSpanA = nextA.fIdx - 1;
+            }
+            for (var m2 = curA.fIdx; m2 <= endSpanA; m2++) {
+                if (m2 >= curA.fIdx && m2 <= curA.tIdx) {
+                    engineAuditIndices[m2] = { active: true, text: curA.label };
+                } else if (!engineAuditIndices[m2] || !engineAuditIndices[m2].text) {
+                    engineAuditIndices[m2] = { active: true, text: "" };
+                }
+            }
+            if (!nextA) {
+                needAuditIndices[curA.tIdx + 12] = { active: true, text: "Need Engine Audit" };
+            }
+        }
+
+        return [
+            { name: "Tech Visit", indices: techVisitIndices, className: "cell-tech-visit" },
+            { name: "Need Tech Visit", indices: needTechIndices, className: "cell-need-tech" },
+            { name: "Engine Audit", indices: engineAuditIndices, className: "cell-engine-audit" },
+            { name: "Need Engine Audit", indices: needAuditIndices, className: "cell-need-audit" }
+        ];
+    }
+
+    function renderTechVisitMatrix(visits, startYear, monthCount) {
+        var tbody = document.getElementById("tableBody3");
+        tbody.innerHTML = "";
+        var baseIndex = (startYear - 2026) * 12;
+        var rowsConfig = buildTechVisitAndAuditRows(visits);
+
+        rowsConfig.forEach(function(cfg) {
+            var tr = document.createElement("tr");
+            var tdName = document.createElement("td");
+            tdName.className = "plan-name-col";
+            tdName.innerText = cfg.name;
+            tr.appendChild(tdName);
+
+            for (var i = 0; i < monthCount; i++) {
+                var absoluteIndex = baseIndex + i;
+                var td = document.createElement("td");
+                var cellData = cfg.indices[absoluteIndex];
+                if (cellData && cellData.active) {
+                    td.innerText = cellData.text || "";
+                    td.className = cfg.className;
+                }
+                tr.appendChild(td);
+            }
+            tbody.appendChild(tr);
+        });
+    }
+
+    function renderTechVisitMatrixBody1Year(visits, year) {
+        renderTechVisitMatrix(visits, year, 12);
+    }
+
+    function renderTechVisitMatrixBody2Years(visits, startYear) {
+        renderTechVisitMatrix(visits, startYear, 24);
+    }
+
+    fetchAllDataFromGoogleSheets();
+</script>
+</body>
+</html>
+

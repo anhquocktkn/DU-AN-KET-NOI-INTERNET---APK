@@ -312,6 +312,23 @@
 </head>
 <body>
 
+<!-- THANH CHUYỂN ĐỔI 2 PHÂN HỆ LỚN (TAB 1: TỪ GOOGLE SHEETS 24/7 | TAB 2: KẾT NỐI PYSIDE6) -->
+<div id="master-top-switcher" style="position:sticky;top:0;z-index:300;background:#090d16;border-bottom:2px solid #0284c7;padding:8px 12px;display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;box-shadow:0 4px 15px rgba(0,0,0,0.4);">
+  <button id="master-btn-google" onclick="switchMasterView('google')" style="padding:10px 18px;border-radius:10px;border:none;font-weight:800;font-size:13px;cursor:pointer;background:linear-gradient(135deg,#0284c7,#2563eb);color:#fff;display:flex;align-items:center;gap:8px;box-shadow:0 2px 10px rgba(2,132,199,0.4);">
+    <span>🚢 1. WEB DỮ LIỆU TỪ GOOGLE (ALLSEA FLEET 24/7)</span>
+  </button>
+  <button id="master-btn-pyside" onclick="switchMasterView('pyside')" style="padding:10px 18px;border-radius:10px;border:1px solid #334155;font-weight:800;font-size:13px;cursor:pointer;background:#1e293b;color:#94a3b8;display:flex;align-items:center;gap:8px;">
+    <span>📱 2. APP KẾT NỐI PYSIDE6 (CHỤP ẢNH GHI CHÚ & BÁO CÁO)</span>
+  </button>
+</div>
+
+<!-- PHÂN HỆ 1: WEB DỮ LIỆU ĐỘI TÀU TỪ GOOGLE SHEETS (LUÔN CÓ NỘI DUNG 24/7) -->
+<div id="master-view-google" style="width:100%;height:calc(100vh - 54px);background:#f8fafc;">
+  <iframe id="google-fleet-frame" src="vessel-plan.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
+</div>
+
+<!-- PHÂN HỆ 2: APP KẾT NỐI PYSIDE6 CHÚNG TA ĐANG LÀM -->
+<div id="master-view-pyside" style="display:none;">
 <div id="toast" class="toast"></div>
 
 <!-- MÀN HÌNH ĐĂNG NHẬP -->
@@ -1300,6 +1317,38 @@
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("/sw.js").catch(() => {});
   }
+
+  function switchMasterView(mode) {
+    const vGoogle = document.getElementById("master-view-google");
+    const vPyside = document.getElementById("master-view-pyside");
+    const bGoogle = document.getElementById("master-btn-google");
+    const bPyside = document.getElementById("master-btn-pyside");
+
+    if (mode === "google") {
+      vGoogle.style.display = "block";
+      vPyside.style.display = "none";
+      bGoogle.style.background = "linear-gradient(135deg,#0284c7,#2563eb)";
+      bGoogle.style.color = "#fff";
+      bGoogle.style.border = "none";
+      bPyside.style.background = "#1e293b";
+      bPyside.style.color = "#94a3b8";
+      bPyside.style.border = "1px solid #334155";
+      document.body.style.paddingBottom = "0px";
+    } else {
+      vGoogle.style.display = "none";
+      vPyside.style.display = "block";
+      bPyside.style.background = "linear-gradient(135deg,#0284c7,#2563eb)";
+      bPyside.style.color = "#fff";
+      bPyside.style.border = "none";
+      bGoogle.style.background = "#1e293b";
+      bGoogle.style.color = "#94a3b8";
+      bGoogle.style.border = "1px solid #334155";
+      document.body.style.paddingBottom = "80px";
+    }
+  }
+  // Mặc định mở Tab 1 (Google Sheets Allsea Fleet) để lúc nào mở lên cũng có đầy đủ nội dung ngay
+  document.body.style.paddingBottom = "0px";
 </script>
+</div>
 </body>
 </html>

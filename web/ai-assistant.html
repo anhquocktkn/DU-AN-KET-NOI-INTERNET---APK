@@ -1,0 +1,288 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Trợ Lý Kỹ Thuật Đội Tàu - Allsea Fleet</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #0f141c; color: #eceff4; min-height: 100vh; display: flex; flex-direction: column; }
+        
+        /* Màn hình Đăng nhập */
+        #login-screen {
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            min-height: 100vh; padding: 24px;
+        }
+        .login-card {
+            background-color: #1a2230; border: 1px solid #2e3b52; border-radius: 16px;
+            padding: 32px 24px; width: 100%; max-width: 380px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+        .login-card h2 { color: #88c0d0; margin-bottom: 8px; font-size: 20px; font-weight: 700; }
+        .login-card p { color: #81a1c1; font-size: 13px; margin-bottom: 24px; }
+        .form-group { margin-bottom: 16px; text-align: left; }
+        .form-group label { display: block; font-size: 12px; color: #d8dee9; margin-bottom: 6px; font-weight: 600; }
+        .form-group input {
+            width: 100%; padding: 12px 14px; background-color: #253146; border: 1px solid #3b4c68;
+            border-radius: 8px; color: #fff; font-size: 15px; outline: none;
+        }
+        .form-group input:focus { border-color: #007acc; }
+        .btn-primary {
+            width: 100%; padding: 13px; background-color: #007acc; color: #fff; border: none;
+            border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 8px;
+        }
+        .btn-primary:active { background-color: #005a9e; }
+        .err-msg { color: #bf616a; font-size: 13px; margin-top: 12px; min-height: 18px; }
+
+        /* Màn hình Chat chính */
+        #chat-screen { display: none; flex-direction: column; height: 100vh; }
+        header {
+            background-color: #1a2230; padding: 12px 16px; border-bottom: 1px solid #2e3b52;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .header-title { font-size: 16px; font-weight: 700; color: #88c0d0; }
+        .header-user { font-size: 12px; color: #a3be8c; display: flex; align-items: center; gap: 8px; }
+        .btn-logout { background: none; border: 1px solid #bf616a; color: #bf616a; padding: 4px 10px; border-radius: 6px; font-size: 12px; }
+
+        /* Thanh Scope chọn tàu */
+        .scope-bar {
+            background-color: #151b26; padding: 8px 12px; border-bottom: 1px solid #253146;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .scope-bar select {
+            flex: 1; padding: 8px 10px; background-color: #253146; border: 1px solid #3b4c68;
+            border-radius: 6px; color: #eceff4; font-size: 13px; outline: none;
+        }
+
+        /* Danh sách tin nhắn */
+        #chat-messages {
+            flex: 1; overflow-y: auto; padding: 16px 12px; display: flex; flex-direction: column; gap: 14px;
+        }
+        .msg { max-width: 88%; border-radius: 14px; padding: 12px 14px; font-size: 14px; line-height: 1.5; word-wrap: break-word; }
+        .msg-user { align-self: flex-end; background-color: #007acc; color: #fff; border-bottom-right-radius: 2px; }
+        .msg-bot { align-self: flex-start; background-color: #1a2230; color: #eceff4; border: 1px solid #2e3b52; border-left: 4px solid #88c0d0; border-bottom-left-radius: 2px; }
+        .msg-bot-title { font-weight: bold; color: #88c0d0; font-size: 12px; margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
+        .loading-dots { display: inline-block; animation: blink 1.2s infinite; }
+        @keyframes blink { 0% { opacity: 0.2; } 50% { opacity: 1; } 100% { opacity: 0.2; } }
+
+        /* Chips gợi ý */
+        .chips-bar {
+            display: flex; gap: 6px; overflow-x: auto; padding: 6px 12px; background-color: #151b26;
+            white-space: nowrap; scrollbar-width: none;
+        }
+        .chips-bar::-webkit-scrollbar { display: none; }
+        .chip {
+            background-color: #253146; color: #88c0d0; border: 1px solid #3b4c68;
+            border-radius: 12px; padding: 5px 12px; font-size: 12px; cursor: pointer;
+        }
+
+        /* Khung nhập tin nhắn */
+        footer {
+            background-color: #1a2230; padding: 10px 12px; border-top: 1px solid #2e3b52;
+            display: flex; gap: 8px;
+        }
+        footer input {
+            flex: 1; padding: 12px 14px; background-color: #253146; border: 1px solid #3b4c68;
+            border-radius: 24px; color: #fff; font-size: 14px; outline: none;
+        }
+        footer button {
+            background-color: #007acc; color: white; border: none; border-radius: 24px;
+            padding: 0 18px; font-weight: bold; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- MÀN HÌNH ĐĂNG NHẬP -->
+    <div id="login-screen">
+        <div class="login-card">
+            <h2>⚓ ALLSEA FLEET AI</h2>
+            <p>Trợ Lý Kỹ Thuật Đội Tàu Biển</p>
+            <div class="form-group">
+                <label>Tên Đăng Nhập</label>
+                <input type="text" id="username" placeholder="Nhập tài khoản được cấp..." autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>Mật Khẩu</label>
+                <input type="password" id="password" placeholder="Nhập mật khẩu...">
+            </div>
+            <button class="btn-primary" onclick="doLogin()">Đăng Nhập</button>
+            <div class="err-msg" id="login-err"></div>
+        </div>
+    </div>
+
+    <!-- MÀN HÌNH CHAT CHÍNH -->
+    <div id="chat-screen">
+        <header>
+            <div class="header-title">⚓ Allsea Technical AI</div>
+            <div class="header-user">
+                <span id="user-display">User</span>
+                <button class="btn-logout" onclick="doLogout()">Thoát</button>
+            </div>
+        </header>
+
+        <div class="scope-bar">
+            <span style="font-size: 12px; color: #81a1c1;">Tàu:</span>
+            <select id="vessel-select">
+                <option value="ALL">🌐 Toàn bộ đội tàu (All Fleet)</option>
+            </select>
+        </div>
+
+        <div id="chat-messages">
+            <div class="msg msg-bot">
+                <div class="msg-bot-title">⚓ Trợ Lý Hàng Hải:</div>
+                Xin chào! Tôi có thể tra cứu thông số máy chính (ME), máy phụ (GE), nồi hơi (Boiler), thiết bị phân ly dầu (OWS), bơm cứu hỏa... trên toàn bộ tài liệu kỹ thuật đội tàu.<br>Hãy chọn tàu hoặc đặt câu hỏi ngay bên dưới!
+            </div>
+        </div>
+
+        <div class="chips-bar">
+            <div class="chip" onclick="quickAsk('ME Tàu Victory')">ME Tàu Victory</div>
+            <div class="chip" onclick="quickAsk('GE Tàu GT Win')">GE Tàu GT Win</div>
+            <div class="chip" onclick="quickAsk('Quy trình phân ly OWS')">Quy trình OWS</div>
+            <div class="chip" onclick="quickAsk('Sơ đồ bơm cứu hỏa')">Bơm cứu hỏa</div>
+            <div class="chip" onclick="quickAsk('Áp suất dầu bôi trơn máy chính')">Áp suất dầu bôi trơn</div>
+        </div>
+
+        <footer>
+            <input type="text" id="query-input" placeholder="Gõ câu hỏi kỹ thuật tàu..." onkeypress="handleKey(event)">
+            <button onclick="sendQuery()">Gửi</button>
+        </footer>
+    </div>
+
+    <script>
+        let currentUser = localStorage.getItem("allsea_ai_user");
+        let authToken = localStorage.getItem("allsea_ai_token");
+
+        window.onload = function() {
+            if (currentUser && authToken) {
+                showChatScreen(currentUser);
+            }
+            loadCatalog();
+        };
+
+        async function doLogin() {
+            const u = document.getElementById("username").value.trim();
+            const p = document.getElementById("password").value.trim();
+            const err = document.getElementById("login-err");
+            err.innerText = "";
+
+            if (!u || !p) {
+                err.innerText = "Vui lòng nhập đầy đủ tài khoản và mật khẩu!";
+                return;
+            }
+
+            try {
+                const res = await fetch("/api/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username: u, password: p })
+                });
+                const data = await res.json();
+                if (data.status === "success") {
+                    currentUser = u;
+                    authToken = data.token;
+                    localStorage.setItem("allsea_ai_user", u);
+                    localStorage.setItem("allsea_ai_token", data.token);
+                    showChatScreen(u);
+                } else {
+                    err.innerText = data.message || "Tài khoản hoặc mật khẩu không chính xác!";
+                }
+            } catch (e) {
+                err.innerText = "Không thể kết nối máy chủ! Hãy đảm bảo Quản trị viên đã bấm Kích hoạt.";
+            }
+        }
+
+        function doLogout() {
+            localStorage.removeItem("allsea_ai_user");
+            localStorage.removeItem("allsea_ai_token");
+            document.getElementById("chat-screen").style.display = "none";
+            document.getElementById("login-screen").style.display = "flex";
+        }
+
+        function showChatScreen(username) {
+            document.getElementById("login-screen").style.display = "none";
+            document.getElementById("chat-screen").style.display = "flex";
+            document.getElementById("user-display").innerText = "👤 " + username;
+        }
+
+        async function loadCatalog() {
+            try {
+                const res = await fetch("/api/catalog");
+                const data = await res.json();
+                if (data.vessels) {
+                    const sel = document.getElementById("vessel-select");
+                    sel.innerHTML = '<option value="ALL">🌐 Toàn bộ đội tàu (All Fleet)</option>';
+                    data.vessels.forEach(v => {
+                        const opt = document.createElement("option");
+                        opt.value = v;
+                        opt.innerText = "🚢 " + v;
+                        sel.appendChild(opt);
+                    });
+                }
+            } catch (e) {}
+        }
+
+        function quickAsk(text) {
+            document.getElementById("query-input").value = text;
+            sendQuery();
+        }
+
+        function handleKey(e) {
+            if (e.key === "Enter") sendQuery();
+        }
+
+        async function sendQuery() {
+            const input = document.getElementById("query-input");
+            const q = input.value.trim();
+            if (!q) return;
+
+            input.value = "";
+            const v = document.getElementById("vessel-select").value;
+
+            appendMsg("user", q);
+
+            const loadingId = "load-" + Date.now();
+            appendMsg("bot", "<i>Đang gửi Gemini AI phân tích ngữ nghĩa và tra cứu tài liệu kỹ thuật... <span class='loading-dots'>⏳</span></i>", loadingId);
+
+            try {
+                const res = await fetch("/api/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ query: q, vessel: v, token: authToken, username: currentUser })
+                });
+                const data = await res.json();
+                const loadEl = document.getElementById(loadingId);
+                if (loadEl) loadEl.remove();
+
+                if (data.status === "success") {
+                    const ans = data.answer.replace(/\\n/g, "<br>");
+                    const prefix = data.notebook_title ? `<div style='font-size:11px; color:#88c0d0; margin-bottom:6px;'>📂 <b>Sổ tra cứu:</b> ${data.notebook_title}</div>` : "";
+                    appendMsg("bot", prefix + ans);
+                } else {
+                    appendMsg("bot", "⚠ " + (data.message || "Không thể lấy câu trả lời."));
+                }
+            } catch (e) {
+                const loadEl = document.getElementById(loadingId);
+                if (loadEl) loadEl.remove();
+                appendMsg("bot", "⚠ Lỗi kết nối máy chủ hoặc máy chủ đã bị ngắt kích hoạt.");
+            }
+        }
+
+        function appendMsg(sender, html, id = null) {
+            const box = document.getElementById("chat-messages");
+            const div = document.createElement("div");
+            div.className = "msg msg-" + sender;
+            if (id) div.id = id;
+
+            if (sender === "bot") {
+                div.innerHTML = "<div class='msg-bot-title'>⚓ Trợ Lý Hàng Hải:</div>" + html;
+            } else {
+                div.innerHTML = html;
+            }
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        }
+    </script>
+</body>
+</html>
+
