@@ -462,9 +462,33 @@ print(res.json())
         custom_row.addWidget(btn_open_pdf)
         r_vbox.addLayout(custom_row)
 
+        email_row = QHBoxLayout()
+        self.inp_pyside_email = QComboBox()
+        self.inp_pyside_email.setEditable(True)
+        self.inp_pyside_email.addItems(["giamdoc@allsea.vn", "kythuat@allsea.vn", " fleet@allsea.vn"])
+        self.inp_pyside_email.setMinimumWidth(210)
+        self.inp_pyside_subject = QLineEdit("[ALLSEA REPORT] Báo cáo kỹ thuật tàu - File PDF đính kèm")
+        self.inp_pyside_hhmm = QLineEdit("17:00")
+        self.inp_pyside_hhmm.setFixedWidth(68)
+        self.inp_pyside_hhmm.setToolTip("Giờ tự động gửi Email (Định dạng HH:MM)")
+        btn_mail_now = QPushButton("📧 Gửi Email PDF Ngay")
+        btn_mail_now.setObjectName("btnSuccess")
+        btn_mail_now.clicked.connect(lambda: self.send_email_from_pyside("now"))
+        btn_mail_sched = QPushButton("⏰ Hẹn Giờ Gửi (HH:MM)")
+        btn_mail_sched.clicked.connect(lambda: self.send_email_from_pyside("schedule"))
+        email_row.addWidget(QLabel("Email nhận:"))
+        email_row.addWidget(self.inp_pyside_email)
+        email_row.addWidget(QLabel("Tựa đề:"))
+        email_row.addWidget(self.inp_pyside_subject, stretch=1)
+        email_row.addWidget(QLabel("Giờ HH:MM:"))
+        email_row.addWidget(self.inp_pyside_hhmm)
+        email_row.addWidget(btn_mail_sched)
+        email_row.addWidget(btn_mail_now)
+        r_vbox.addLayout(email_row)
+
         layout.addWidget(left_group, stretch=5)
         layout.addWidget(right_group, stretch=5)
-        self.tabs.addTab(tab, "🤖 3. Nhận Ảnh/Ghi Chú & Tự Động Trả Báo Cáo")
+        self.tabs.addTab(tab, "🤖 3. Nhận Báo Cáo -> Xuất PDF & Gửi Email Tự Động")
 
     # ==================== TAB 4: QUẢN LÝ TÀI KHOẢN & PHÂN QUYỀN ====================
     def init_tab_users(self):
@@ -959,6 +983,46 @@ print(res.json())
             webbrowser.open(f"{SERVER_URL}{target}")
         else:
             QMessageBox.information(self, "Thông báo", "Mục này chưa có file PDF/HTML, hãy bấm xử lý trước!")
+
+    def send_email_from_pyside(self, mode: str = "now"):
+        row_idx = self.tbl_subs.currentRow()
+        if row_idx < 0 or not hasattr(self, "_cached_subs"):
+            if hasattr(self, "_cached_subs") and self._cached_subs:
+                row_idx = 0
+            else:
+                QMessageBox.information(self, "Thông báo", "Chưa có báo cáo nào để gửi Email!")
+                return
+        s = self._cached_subs[row_idx]
+        recipients = self.inp_pyside_email.currentText().strip()
+        subject = self.inp_pyside_subject.text().strip() or f"[ALLSEA REPORT] {s['title']}"
+        hhmm = self.inp_pyside_hhmm.text().strip() or "17:00"
+        if not recipients:
+            QMessageBox.warning(self, "Thiếu người nhận", "Vui lòng nhập địa chỉ Email người nhận!")
+            return
+        try:
+            r = requests.post(
+                f"{SERVER_URL}/api/email/send",
+                json={
+                    "submission_id": s["id"],
+                    "recipients": recipients,
+                    "subject": subject,
+                    "mode": mode,
+                    "schedule_hhmm": hhmm,
+                },
+                timeout=6,
+            )
+            if r.ok:
+                data = r.json()
+                if self.inp_pyside_email.findText(recipients) == -1:
+                    self.inp_pyside_email.addItem(recipients)
+                msg = data.get("message") or f"Đã thực thi tác vụ Email ({mode}) cho báo cáo #{s['id']}!"
+                self.log_msg(f"📧 [EMAIL PDF] {msg}")
+                QMessageBox.information(self, "Thành công", msg)
+                self.refresh_submissions()
+            else:
+                QMessageBox.warning(self, "Lỗi gửi Email", r.text)
+        except Exception as e:
+            QMessageBox.warning(self, "Lỗi kết nối", str(e))
 
     def refresh_users(self):
         try:

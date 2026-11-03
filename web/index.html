@@ -468,7 +468,11 @@
 
         <!-- ==================== MẪU 1: FORM BÁO CÁO NGÀY ALLSEA MANAGEMENT JSC ==================== -->
         <div id="tpl-allsea-daily" style="background:#ffffff;color:#0f172a;border-radius:14px;padding:22px;border:2px solid #0284c7;box-shadow:0 10px 30px rgba(0,0,0,0.35);">
-          <!-- HEADER KHUNG LOGO GÓC TRÁI + Ở GIỮA "ALLSEA MANAGEMENT JSC" REPORT -->
+          <div style="background:#f0f9ff;border:1px dashed #0284c7;border-radius:8px;padding:7px 12px;margin-bottom:10px;font-size:12px;color:#0369a1;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
+            <span>✏️ <b>100% NỘI DUNG TRÊN BÁO CÁO ĐỀU SỬA ĐƯỢC:</b> Bạn có thể bấm vào bất kỳ chữ/nhãn/tiêu đề nào bên dưới để sửa tự do (không cố định chữ nào).</span>
+          </div>
+
+          <!-- HEADER KHUNG LOGO GÓC TRÁI + Ở GIỮA "ALLSEA MANAGEMENT JSC" REPORT (SỬA TỰ DO) -->
           <table style="width:100%;border-collapse:collapse;border:2px solid #000;margin-bottom:14px;background:#fff;">
             <tr>
               <td style="width:110px;border:1.5px solid #000;text-align:center;padding:8px;vertical-align:middle;">
@@ -479,8 +483,8 @@
                 </label>
               </td>
               <td style="border:1.5px solid #000;text-align:center;padding:10px 14px;vertical-align:middle;">
-                <div style="font-size:17px;font-weight:900;color:#0f172a;letter-spacing:0.5px;">ALLSEA MANAGEMENT JSC</div>
-                <div style="font-size:13px;font-weight:700;color:#334155;margin-top:2px;">CÔNG TY CỔ PHẦN ALLSEA MANAGEMENT — REPORT</div>
+                <input type="text" id="allsea-company-title" value="ALLSEA MANAGEMENT JSC" placeholder="Tên công ty dòng 1..." style="width:100%;background:transparent;border:1px dashed #cbd5e1;font-size:17px;font-weight:900;color:#0f172a;text-align:center;padding:3px 8px;margin-bottom:3px;" />
+                <input type="text" id="allsea-company-subtitle" value="CÔNG TY CỔ PHẦN ALLSEA MANAGEMENT" placeholder="Tên công ty dòng 2 (hoặc xóa trống nếu không dùng)..." style="width:100%;background:transparent;border:1px dashed #cbd5e1;font-size:12.5px;font-weight:700;color:#334155;text-align:center;padding:2px 8px;" />
                 <!-- PHẦN BÁO CÁO NGÀY: CHỌN HOẶC GHI BẰNG TAY, TỰ ĐỘNG ĐƯA VÀO FORM -->
                 <div style="margin-top:8px;display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;">
                   <select id="quick-report-title-select" onchange="onSelectReportHeaderTitle(this.value)" style="width:auto;background:#f1f5f9;color:#0f172a;border:1px solid #94a3b8;padding:5px 10px;font-size:12px;font-weight:700;">
@@ -488,20 +492,23 @@
                     <option value="BÁO CÁO SỬA CHỮA LÊN ĐÀ (DOCKING REPORT)">Chọn nhanh: BÁO CÁO LÊN ĐÀ (DOCKING)</option>
                     <option value="BÁO CÁO KỸ THUẬT ĐỘT XUẤT (OTHER REPORT)">Chọn nhanh: BÁO CÁO KHÁC (OTHER)</option>
                   </select>
-                  <input type="text" id="allsea-report-header-title" value="BÁO CÁO NGÀY" placeholder="Hoặc gõ tay tiêu đề báo cáo..." style="width:280px;max-width:100%;background:#fffbeb;color:#0f172a;border:1.5px solid #0284c7;font-weight:800;font-size:14px;text-align:center;padding:6px 10px;" />
+                  <input type="text" id="allsea-report-header-title" value="BÁO CÁO NGÀY" placeholder="Hoặc gõ tay tiêu đề báo cáo..." style="width:300px;max-width:100%;background:#fffbeb;color:#0f172a;border:1.5px solid #0284c7;font-weight:800;font-size:14px;text-align:center;padding:6px 10px;" />
                 </div>
               </td>
             </tr>
           </table>
 
-          <!-- KHUNG SHIP NAME (CHỌN DROP LIST HOẶC ĐIỀN TAY) | NGƯỜI BÁO CÁO (ĐIỀN TAY) | ITEMS (DROP LIST) -->
-          <table style="width:100%;border-collapse:collapse;border:1.5px solid #000;margin-bottom:14px;background:#fff;">
+          <!-- KHUNG SHIP NAME | NGƯỜI BÁO CÁO | ITEMS (CẢ NHÃN VÀ GIÁ TRỊ ĐỀU SỬA ĐƯỢC) -->
+          <table style="width:100%;border-collapse:collapse;border:1.5px solid #000;margin-bottom:12px;background:#fff;">
             <tr>
               <td style="width:50%;border:1px solid #000;padding:8px 10px;">
-                <div style="font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">SHIP NAME (Chọn Drop list hoặc gõ tay):</div>
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                  <input type="text" id="allsea-label-ship" value="Ship's name :" title="Sửa nhãn cột này tùy ý" style="width:120px;background:#f8fafc;color:#0f172a;border:1px dashed #94a3b8;font-size:12px;font-weight:800;padding:3px 6px;" />
+                  <span style="font-size:11px;color:#64748b;">(Chọn hoặc gõ tay cả nhãn & tên):</span>
+                </div>
                 <div style="display:flex;gap:6px;">
-                  <select id="ship-select-drop" onchange="if(this.value)document.getElementById('allsea-ship-name').value=this.value" style="width:135px;background:#f1f5f9;color:#0f172a;border:1px solid #94a3b8;padding:6px;font-size:12px;font-weight:700;">
-                    <option value="">-- Chọn tàu --</option>
+                  <select id="ship-select-drop" onchange="if(this.value)document.getElementById('allsea-ship-name').value=this.value" style="width:130px;background:#f1f5f9;color:#0f172a;border:1px solid #94a3b8;padding:6px;font-size:12px;font-weight:700;">
+                    <option value="">-- Chọn mẫu --</option>
                     <option value="LS JUPITER" selected>LS JUPITER</option>
                     <option value="LS MERCURY">LS MERCURY</option>
                     <option value="LS NEPTUNE">LS NEPTUNE</option>
@@ -515,19 +522,25 @@
                     <option value="MG 02">MG 02</option>
                     <option value="MG 03">MG 03</option>
                   </select>
-                  <input type="text" id="allsea-ship-name" value="LS JUPITER" placeholder="Hoặc tự gõ tên tàu..." style="flex:1;background:#fff;color:#0f172a;border:1px solid #64748b;font-weight:700;padding:6px 10px;" />
+                  <input type="text" id="allsea-ship-name" value="LS JUPITER" placeholder="Gõ tên tàu / đơn vị..." style="flex:1;background:#fff;color:#0f172a;border:1px solid #64748b;font-weight:700;padding:6px 10px;" />
                 </div>
               </td>
               <td style="width:50%;border:1px solid #000;padding:8px 10px;">
-                <div style="font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">NGƯỜI BÁO CÁO / SUPERINTENDENT (Điền tay):</div>
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                  <input type="text" id="allsea-label-reporter" value="Superintendent :" title="Sửa nhãn người báo cáo tùy ý" style="width:140px;background:#f8fafc;color:#0f172a;border:1px dashed #94a3b8;font-size:12px;font-weight:800;padding:3px 6px;" />
+                  <span style="font-size:11px;color:#64748b;">(Điền tay):</span>
+                </div>
                 <input type="text" id="allsea-reporter" value="Mr. XUÂN ANH" placeholder="Nhập tên người báo cáo..." style="width:100%;background:#fff;color:#0f172a;border:1px solid #64748b;font-weight:700;padding:6px 10px;" />
               </td>
             </tr>
             <tr>
               <td style="border:1px solid #000;padding:8px 10px;">
-                <div style="font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">ITEMS (Chọn Drop list hoặc ghi thêm):</div>
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                  <input type="text" id="allsea-label-items" value="Items :" title="Sửa nhãn Items tùy ý" style="width:95px;background:#f8fafc;color:#0f172a;border:1px dashed #94a3b8;font-size:12px;font-weight:800;padding:3px 6px;" />
+                  <span style="font-size:11px;color:#64748b;">(Chọn nhanh hoặc gõ tay):</span>
+                </div>
                 <div style="display:flex;gap:6px;">
-                  <select id="allsea-item-drop" onchange="onSelectItemType(this.value)" style="width:155px;background:#f1f5f9;color:#0f172a;border:1px solid #94a3b8;padding:6px;font-size:12px;font-weight:700;">
+                  <select id="allsea-item-drop" onchange="onSelectItemType(this.value)" style="width:145px;background:#f1f5f9;color:#0f172a;border:1px solid #94a3b8;padding:6px;font-size:12px;font-weight:700;">
                     <option value="DAILY REPORT" selected>DAILY REPORT</option>
                     <option value="DOCKING REPORT">DOCKING REPORT</option>
                     <option value="OTHER REPORT">OTHER REPORT</option>
@@ -536,37 +549,36 @@
                 </div>
               </td>
               <td style="border:1px solid #000;padding:8px 10px;">
-                <div style="font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">NGÀY BÁO CÁO (Chọn lịch hoặc tự gõ):</div>
+                <div style="font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">DÒNG NGÀY THÁNG BÁO CÁO (Chọn lịch hoặc tự gõ chữ bất kỳ):</div>
                 <div style="display:flex;gap:6px;">
-                  <input type="date" id="allsea-date-picker" onchange="onPickReportDate(this.value)" style="width:140px;background:#f1f5f9;color:#0f172a;border:1px solid #94a3b8;padding:5px;font-size:12px;" />
+                  <input type="date" id="allsea-date-picker" onchange="onPickReportDate(this.value)" style="width:135px;background:#f1f5f9;color:#0f172a;border:1px solid #94a3b8;padding:5px;font-size:12px;" />
                   <input type="text" id="allsea-report-date" value="Ngày 03/11/2026" style="flex:1;background:#fff;color:#0f172a;border:1px solid #64748b;font-weight:700;padding:6px 10px;" />
                 </div>
               </td>
             </tr>
           </table>
 
-          <div style="font-size:13px;margin-bottom:10px;color:#0f172a;">
-            Kính gửi: <b>BAN LÃNH ĐẠO CÔNG TY.</b>
-          </div>
-
-          <!-- A. HẠNG MỤC PHÁT SINH -->
+          <!-- DÒNG KÍNH GỬI (SỬA TỰ DO) -->
           <div style="margin-bottom:10px;">
-            <label style="font-weight:800;font-size:13px;color:#0f172a;display:block;margin-bottom:4px;">A. HẠNG MỤC PHÁT SINH (Nếu có):</label>
-            <input type="text" id="allsea-arising" placeholder="Nhập hạng mục phát sinh trong ngày (hoặc để trống)..." style="background:#f8fafc;color:#0f172a;border:1px solid #94a3b8;padding:8px 10px;" />
+            <input type="text" id="allsea-salutation" value="Kính gửi: BAN LÃNH ĐẠO CÔNG TY." placeholder="Dòng kính gửi (hoặc xóa trống nếu không cần)..." style="width:100%;background:#f8fafc;color:#0f172a;border:1px dashed #94a3b8;font-weight:700;font-size:13px;padding:6px 10px;" />
           </div>
 
-          <!-- B. NỘI DUNG CÔNG VIỆC HẰNG NGÀY (BẢNG KHUNG SỬA ĐƯỢC + NÚT '+' THÊM MỤC) -->
+          <!-- A. HẠNG MỤC PHÁT SINH (TIÊU ĐỀ MỤC A VÀ NỘI DUNG ĐỀU SỬA ĐƯỢC) -->
+          <div style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <input type="text" id="allsea-sec-a-title" value="A. HẠNG MỤC PHÁT SINH:" title="Tiêu đề mục A (sửa tự do)" style="width:230px;background:#f1f5f9;color:#0f172a;border:1px dashed #64748b;font-weight:800;font-size:13px;padding:7px 10px;" />
+            <input type="text" id="allsea-arising" placeholder="Nhập nội dung phát sinh trong ngày (hoặc để trống)..." style="flex:1;min-width:220px;background:#f8fafc;color:#0f172a;border:1px solid #94a3b8;padding:7px 10px;" />
+          </div>
+
+          <!-- B. NỘI DUNG CÔNG VIỆC HẰNG NGÀY (TIÊU ĐỀ MỤC B + BẢNG KHUNG SỬA ĐƯỢC + NÚT '+' THÊM MỤC) -->
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;background:#f1f5f9;padding:8px 12px;border-radius:10px;border:1px solid #cbd5e1;">
-            <div>
-              <div style="font-weight:800;font-size:13.5px;color:#0f172a;">
-                B. NỘI DUNG CÔNG VIỆC HẰNG NGÀY
-              </div>
+            <div style="flex:1;min-width:240px;">
+              <input type="text" id="allsea-sec-b-title" value="B. NỘI DUNG CÔNG VIỆC HẰNG NGÀY:" title="Tiêu đề mục B (sửa tự do)" style="width:100%;max-width:420px;background:#fff;color:#0f172a;border:1px dashed #64748b;font-weight:800;font-size:13.5px;padding:5px 10px;margin-bottom:4px;" />
               <div style="font-size:11.5px;color:#475569;">
-                💡 Mẹo nhập nhanh: Bấm các nút gợi ý <b>(Đã xong / Đang làm)</b> dưới ô Tiến độ hoặc bấm <b>➕</b> để chèn nhanh dòng mới ngay bên dưới.
+                💡 Mọi tiêu đề cột (STT, Nội dung, Phương án, Tiến độ) và từng dòng bên dưới đều bấm vào sửa trực tiếp được.
               </div>
             </div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
-              <button type="button" class="btn btn-outline" style="padding:6px 12px;font-size:11.5px;background:#fff;color:#0284c7;border-color:#0284c7;font-weight:700;" onclick="loadSampleAllseaRows()">📋 Nạp mẫu chuẩn</button>
+              <button type="button" class="btn btn-outline" style="padding:6px 12px;font-size:11.5px;background:#fff;color:#0284c7;border-color:#0284c7;font-weight:700;" onclick="loadSampleAllseaRows()">📋 Nạp khung mẫu</button>
               <button type="button" class="btn btn-outline" style="padding:6px 12px;font-size:11.5px;background:#fee2e2;color:#991b1b;border-color:#fca5a5;font-weight:700;" onclick="clearAllseaRows()">🧹 Làm trống bảng</button>
             </div>
           </div>
@@ -576,16 +588,16 @@
               <thead>
                 <tr style="background:#e2e8f0;">
                   <th style="border:1px solid #000;width:52px;padding:6px;">
-                    <input type="text" id="hdr-col-0" value="STT" style="background:transparent;border:none;color:#0f172a;font-weight:800;text-align:center;padding:2px;font-size:12px;" />
+                    <input type="text" id="hdr-col-0" value="STT" style="background:#fff;border:1px dashed #94a3b8;color:#0f172a;font-weight:800;text-align:center;padding:3px;font-size:12px;" />
                   </th>
                   <th style="border:1px solid #000;width:30%;padding:6px;">
-                    <input type="text" id="hdr-col-1" value="NỘI DUNG CÔNG VIỆC" style="background:transparent;border:none;color:#0f172a;font-weight:800;text-align:center;padding:2px;font-size:12px;" />
+                    <input type="text" id="hdr-col-1" value="NỘI DUNG CÔNG VIỆC" style="background:#fff;border:1px dashed #94a3b8;color:#0f172a;font-weight:800;text-align:center;padding:3px;font-size:12px;" />
                   </th>
                   <th style="border:1px solid #000;width:38%;padding:6px;">
-                    <input type="text" id="hdr-col-2" value="PHƯƠNG ÁN" style="background:transparent;border:none;color:#0f172a;font-weight:800;text-align:center;padding:2px;font-size:12px;" />
+                    <input type="text" id="hdr-col-2" value="PHƯƠNG ÁN SỬA CHỮA" style="background:#fff;border:1px dashed #94a3b8;color:#0f172a;font-weight:800;text-align:center;padding:3px;font-size:12px;" />
                   </th>
                   <th style="border:1px solid #000;width:20%;padding:6px;">
-                    <input type="text" id="hdr-col-3" value="TIẾN ĐỘ DỰ KIẾN" style="background:transparent;border:none;color:#0f172a;font-weight:800;text-align:center;padding:2px;font-size:12px;" />
+                    <input type="text" id="hdr-col-3" value="TIẾN ĐỘ" style="background:#fff;border:1px dashed #94a3b8;color:#0f172a;font-weight:800;text-align:center;padding:3px;font-size:12px;" />
                   </th>
                   <th style="border:1px solid #000;width:72px;padding:4px;text-align:center;color:#0f172a;font-size:11px;">Thao tác</th>
                 </tr>
@@ -595,7 +607,7 @@
           </div>
 
           <!-- NÚT "+" ĐỂ THÊM MỤC ĐÁNH TAY VÀO -->
-          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
             <button type="button" onclick="addAllseaWorkRow(false)" style="flex:1;min-width:220px;padding:11px 16px;border-radius:10px;border:2px dashed #0284c7;background:#f0f9ff;color:#0369a1;font-weight:800;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
               <span style="font-size:18px;">➕</span> THÊM MỤC CÔNG VIỆC ĐÁNH TAY (+)
             </button>
@@ -604,15 +616,20 @@
             </button>
           </div>
 
-          <!-- C. HÌNH ẢNH SỬA TRONG NGÀY (CHỤP ẢNH HOẶC CHỌN TỪ ĐIỆN THOẠI -> TỰ ĐỘNG SẮP XẾP GỌN GÀNG RÕ NÉT) -->
-          <div style="border-top:2px solid #cbd5e1;padding-top:14px;margin-bottom:18px;">
+          <!-- C. HÌNH ẢNH SỬA TRONG NGÀY (TỐI ƯU TỐC ĐỘ 4G/5G + TIÊU ĐỀ MỤC C SỬA ĐƯỢC) -->
+          <div style="border-top:2px solid #cbd5e1;padding-top:14px;margin-bottom:14px;">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
-              <div>
-                <div style="font-weight:800;font-size:13.5px;color:#0f172a;">
-                  C. MỘT SỐ HÌNH ẢNH SỬA TRONG NGÀY (<span id="photo-count-label">0</span> ảnh)
+              <div style="flex:1;min-width:250px;">
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
+                  <input type="text" id="allsea-sec-c-title" value="C. MỘT SỐ HÌNH ẢNH SỬA TRONG NGÀY:" title="Tiêu đề mục C (sửa tự do)" style="width:320px;max-width:100%;background:#f8fafc;color:#0f172a;border:1px dashed #64748b;font-weight:800;font-size:13.5px;padding:5px 10px;" />
+                  <span style="font-size:12px;font-weight:800;color:#0284c7;">(<span id="photo-count-label">0</span> ảnh)</span>
                 </div>
-                <div style="font-size:11.5px;color:#475569;">
-                  Chụp trực tiếp hoặc chọn 12+ ảnh cùng lúc -> Tự động nén tốc độ cao & sắp xếp lưới 4 cột gọn gàng, rõ nét.
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:11.5px;color:#475569;">
+                  <span>📶 Chế độ truyền 4G/5G:</span>
+                  <select id="photo-compress-mode" style="width:auto;background:#dcfce7;color:#166534;border:1px solid #4ade80;padding:3px 8px;font-size:11.5px;font-weight:800;border-radius:6px;">
+                    <option value="fast_4g" selected>⚡ Siêu tốc 4G/5G (640px, ~25KB/ảnh — Gửi & Tải PDF cực nhanh)</option>
+                    <option value="hq_wifi">💎 Chất lượng cao Wi-Fi (880px, ~65KB/ảnh)</option>
+                  </select>
                 </div>
               </div>
               <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -621,12 +638,9 @@
                   <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="handleReportPhotosUpload(event)" />
                 </label>
                 <label class="btn btn-primary" style="cursor:pointer;padding:9px 14px;font-size:12.5px;width:auto;">
-                  🖼️ Chọn Nhiều Ảnh (12+ ảnh)
+                  🖼️ Chọn Nhiều Ảnh Từ Máy
                   <input type="file" accept="image/*" multiple style="display:none;" onchange="handleReportPhotosUpload(event)" />
                 </label>
-                <button type="button" onclick="loadSample12Photos()" style="padding:9px 12px;border-radius:10px;border:1px solid #0284c7;background:#e0f2fe;color:#0369a1;font-weight:700;font-size:12px;cursor:pointer;">
-                  ⚡ Nạp Thử 12 Ảnh Mẫu
-                </button>
                 <button type="button" onclick="clearAllseaPhotos()" style="padding:9px 12px;border-radius:10px;border:1px solid #fca5a5;background:#fee2e2;color:#991b1b;font-weight:700;font-size:12px;cursor:pointer;">
                   🗑️ Xóa Ảnh
                 </button>
@@ -634,7 +648,61 @@
             </div>
 
             <!-- LƯỚI ẢNH TỰ ĐỘNG SẮP XẾP GỌN GÀNG 4 CỘT -->
-            <div id="allsea-photos-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:10px;min-height:90px;background:#f8fafc;border:1.5px dashed #94a3b8;border-radius:10px;padding:10px;"></div>
+            <div id="allsea-photos-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:10px;min-height:80px;background:#f8fafc;border:1.5px dashed #94a3b8;border-radius:10px;padding:10px;"></div>
+          </div>
+
+          <!-- DÒNG GHI CHÚ CUỐI TRANG / CHỮ KÝ NGƯỜI LẬP (TÙY CHỌN, SỬA TỰ DO) -->
+          <div style="margin-bottom:14px;">
+            <label style="font-size:11.5px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">GHI CHÚ CUỐI BÁO CÁO / CHỮ KÝ (Tùy chọn — Sửa tự do hoặc để trống):</label>
+            <textarea id="allsea-footer-note" rows="2" placeholder="VD: Người lập báo cáo: Mr. Xuân Anh — Đã kiểm tra và xác nhận hiện trường..." style="width:100%;background:#f8fafc;color:#0f172a;border:1px dashed #94a3b8;padding:7px 10px;font-size:12.5px;"></textarea>
+          </div>
+
+          <!-- 📧 KHUNG TÁC VỤ GỬI EMAIL BÁO CÁO PDF (GỬI NGAY HOẶC HẸN GIỜ HH:MM) & DANH BẠ EMAIL LƯU SẴN -->
+          <div style="background:#f0fdf4;border:1.5px solid #22c55e;border-radius:12px;padding:12px 14px;margin-bottom:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+              <div style="font-weight:800;font-size:13.5px;color:#15803d;display:flex;align-items:center;gap:6px;">
+                <span>📧 TÁC VỤ GỬI EMAIL FILE PDF SAU KHI PYTHON XỬ LÝ XONG</span>
+              </div>
+              <button type="button" onclick="openEmailSettingsModal()" style="background:#15803d;color:#fff;border:none;border-radius:8px;padding:5px 12px;font-size:11.5px;font-weight:700;cursor:pointer;">
+                ⚙️ Cài Đặt Mail SMTP & Tự Động Hàng Ngày (HH:MM)
+              </button>
+            </div>
+
+            <!-- DANH BẠ EMAIL ĐÃ LƯU ĐỂ CHỌN NHANH 1 CHẠM -->
+            <div style="margin-bottom:8px;">
+              <div style="font-size:11.5px;font-weight:700;color:#166534;margin-bottom:4px;">
+                📌 Địa chỉ Email đã lưu (Bấm vào để chọn nhanh người nhận, hoặc bấm ➕ để lưu mới):
+              </div>
+              <div id="saved-email-chips" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;"></div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:8px;">
+              <div>
+                <label style="font-size:11px;font-weight:700;color:#166534;display:block;margin-bottom:3px;">Người nhận Email (cách nhau dấu phẩy):</label>
+                <div style="display:flex;gap:4px;">
+                  <input type="text" id="email-recipients-input" placeholder="VD: giamdoc@allsea.vn, kythuat@allsea.vn" style="flex:1;background:#fff;color:#0f172a;border:1px solid #86efac;padding:7px 9px;font-size:12.5px;font-weight:700;" />
+                  <button type="button" onclick="quickSaveCurrentEmailContact()" title="Lưu địa chỉ Email này vào danh bạ để lần sau chọn nhanh" style="background:#dcfce7;color:#15803d;border:1px solid #86efac;border-radius:8px;padding:0 10px;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;">➕ Lưu</button>
+                </div>
+              </div>
+              <div>
+                <label style="font-size:11px;font-weight:700;color:#166534;display:block;margin-bottom:3px;">Tựa đề Email (Subject — để trống sẽ tự lấy theo Tên Tàu & Ngày):</label>
+                <input type="text" id="email-subject-input" placeholder="VD: [ALLSEA] Báo cáo ngày tàu LS JUPITER..." style="width:100%;background:#fff;color:#0f172a;border:1px solid #86efac;padding:7px 9px;font-size:12.5px;" />
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#dcfce7;padding:8px 12px;border-radius:8px;">
+              <span style="font-size:12px;font-weight:800;color:#14532d;">Chế độ gửi Mail khi bấm Gửi về Python:</span>
+              <label style="font-size:12px;font-weight:700;color:#0f172a;cursor:pointer;display:flex;align-items:center;gap:4px;">
+                <input type="radio" name="email_send_mode" value="none" checked onchange="toggleEmailScheduleTimeBox()" /> Chỉ xuất PDF (Chưa gửi Mail)
+              </label>
+              <label style="font-size:12px;font-weight:800;color:#15803d;cursor:pointer;display:flex;align-items:center;gap:4px;">
+                <input type="radio" name="email_send_mode" value="send_now" onchange="toggleEmailScheduleTimeBox()" /> 🚀 Gửi Mail PDF Ngay Lập Tức
+              </label>
+              <label style="font-size:12px;font-weight:800;color:#0369a1;cursor:pointer;display:flex;align-items:center;gap:4px;">
+                <input type="radio" name="email_send_mode" value="schedule" onchange="toggleEmailScheduleTimeBox()" /> ⏰ Hẹn Giờ Tự Động Gửi Lúc (HH:MM):
+              </label>
+              <input type="time" id="email-schedule-hhmm" value="17:00" style="width:110px;background:#fff;color:#0f172a;border:1.5px solid #0284c7;padding:4px 8px;font-weight:800;font-size:13px;border-radius:6px;" />
+            </div>
           </div>
 
           <!-- CÁC NÚT THAO TÁC: LƯU OFFLINE (CHO APK) | GỬI VỀ PYTHON XỬ LÝ | XUẤT PDF TRỰC TIẾP | XEM TRƯỚC A4 -->
@@ -643,13 +711,13 @@
               💾 LƯU OFFLINE (KHI MẤT MẠNG)
             </button>
             <button type="button" id="btn-send-allsea" onclick="submitAllseaReportToPython()" style="padding:14px;border-radius:10px;border:none;background:linear-gradient(135deg,#0284c7,#1d4ed8);color:#fff;font-weight:800;font-size:13.5px;cursor:pointer;">
-              🚀 GỬI VỀ PYTHON & NHẬN BÁO CÁO NGAY
+              🚀 GỬI VỀ PYTHON -> XUẤT PDF (& GỬI MAIL)
             </button>
             <button type="button" onclick="exportCurrentFormToPdfDirect()" style="padding:14px;border-radius:10px;border:none;background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;font-weight:800;font-size:13.5px;cursor:pointer;">
               📥 XUẤT BÁO CÁO SANG PDF (.PDF)
             </button>
             <button type="button" onclick="previewAllseaPrintableNow()" style="padding:14px;border-radius:10px;border:1.5px solid #0f172a;background:#f1f5f9;color:#0f172a;font-weight:800;font-size:13px;cursor:pointer;">
-              🖨️ XEM TRƯỚC / IN BẢN A4
+              🖨️ XEM TRƯỚC / SỬA TRÊN A4
             </button>
           </div>
         </div>
@@ -849,6 +917,91 @@
       3. Nếu điện thoại dùng 4G hoặc khác Wi-Fi, hãy quét mã <b>Số 2 (Qua 4G / Internet từ xa)</b>.
     </div>
     <button class="btn btn-primary" onclick="closeQrModal()">Đã Hiểu</button>
+  </div>
+</div>
+
+<!-- MODAL CÀI ĐẶT EMAIL SMTP / DANH BẠ LƯU SẴN / HẸN GIỜ HH:MM & GỬI MAIL THỦ CÔNG -->
+<div id="email-modal" class="modal-backdrop" onclick="if(event.target===this)closeEmailModal()">
+  <div class="modal-box" style="max-width:640px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:14px;">
+      <h3 style="margin:0;color:#4ade80;" id="email-modal-title">📧 Cài Đặt Gửi Email Báo Cáo PDF & Hẹn Giờ Tự Động (HH:MM)</h3>
+      <button class="btn btn-outline" style="padding:5px 12px;" onclick="closeEmailModal()">✕ Đóng</button>
+    </div>
+
+    <input type="hidden" id="modal-email-sub-id" value="" />
+
+    <!-- PHẦN 1: DANH BẠ EMAIL LƯU SẴN (CHỌN NHANH) -->
+    <div style="background:#0f172a;padding:12px;border-radius:10px;border:1px solid var(--border);margin-bottom:12px;">
+      <div style="font-size:12.5px;font-weight:700;color:#38bdf8;margin-bottom:6px;">
+        📌 Danh bạ Email người nhận đã lưu (Bấm vào tên để thêm vào ô Người nhận):
+      </div>
+      <div id="modal-saved-contacts-list" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;"></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <input type="text" id="new-contact-name" placeholder="Tên gợi nhớ (VD: Ban Giám Đốc)" style="width:160px;padding:6px 10px;font-size:12px;" />
+        <input type="email" id="new-contact-email" placeholder="Địa chỉ Email (VD: sếp@congty.vn)" style="flex:1;min-width:180px;padding:6px 10px;font-size:12px;" />
+        <button type="button" class="btn btn-success" style="padding:6px 12px;font-size:12px;" onclick="addNewContactFromModal()">➕ Lưu địa chỉ</button>
+      </div>
+    </div>
+
+    <!-- PHẦN 2: NGƯỜI NHẬN, TỰA ĐỀ (SUBJECT) & NỘI DUNG MAIL -->
+    <div style="display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:12px;">
+      <div>
+        <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px;">Người nhận (Recipients — cách nhau bằng dấu phẩy):</label>
+        <input type="text" id="modal-email-recipients" placeholder="VD: giamdoc@allsea.vn, kythuat@allsea.vn" style="font-weight:700;" />
+      </div>
+      <div>
+        <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px;">Tựa đề Email (Subject):</label>
+        <input type="text" id="modal-email-subject" placeholder="VD: [ALLSEA REPORT] Báo cáo ngày - Đính kèm PDF" />
+      </div>
+      <div>
+        <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px;">Nội dung thư (Body):</label>
+        <textarea id="modal-email-body" rows="2">Kính gửi Ban Lãnh Đạo,
+Hệ thống Python đã xử lý xong Báo cáo và đính kèm file PDF chuẩn A4 trong email này.</textarea>
+      </div>
+    </div>
+
+    <!-- PHẦN 3: HẸN GIỜ TỰ ĐỘNG GỬI HÀNG NGÀY (HH:MM) & CẤU HÌNH SMTP -->
+    <div style="background:#0f172a;padding:12px;border-radius:10px;border:1px solid var(--border);margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+        <label style="font-size:13px;font-weight:700;color:#facc15;cursor:pointer;display:flex;align-items:center;gap:6px;">
+          <input type="checkbox" id="modal-auto-daily-enabled" style="width:16px;height:16px;" />
+          ⏰ Tự động gửi Email các báo cáo PDF trong ngày vào lúc (HH:MM):
+        </label>
+        <input type="time" id="modal-daily-hhmm" value="17:00" style="width:120px;font-weight:800;font-size:14px;color:#38bdf8;background:#1e293b;border:1px solid #38bdf8;padding:4px 8px;" />
+      </div>
+
+      <details style="font-size:12px;color:var(--muted);">
+        <summary style="cursor:pointer;color:#94a3b8;font-weight:700;">⚙️ Cấu hình tài khoản gửi SMTP (Gmail / Outlook / Tên miền công ty — Tùy chọn)</summary>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin-top:8px;">
+          <div>
+            <label>SMTP Host</label>
+            <input type="text" id="modal-smtp-host" value="smtp.gmail.com" style="padding:6px;font-size:12px;" />
+          </div>
+          <div>
+            <label>SMTP Port</label>
+            <input type="number" id="modal-smtp-port" value="587" style="padding:6px;font-size:12px;" />
+          </div>
+          <div>
+            <label>Email gửi đi (Sender Email)</label>
+            <input type="text" id="modal-smtp-user" placeholder="VD: baocao@allsea.vn" style="padding:6px;font-size:12px;" />
+          </div>
+          <div>
+            <label>Mật khẩu ứng dụng (App Password)</label>
+            <input type="password" id="modal-smtp-pass" placeholder="Mật khẩu SMTP / App Password" style="padding:6px;font-size:12px;" />
+          </div>
+        </div>
+        <div style="font-size:11px;color:#64748b;margin-top:6px;">
+          * Lưu ý: Ngay cả khi chưa điền mật khẩu SMTP, hệ thống Python vẫn đóng gói bản tin Email chuẩn <code>.eml</code> kèm file <code>.pdf</code> lưu vào thư mục <code>DU_AN_ALLSEA_STORAGE_DATA/emails_outbox</code> và thực thi đúng lịch hẹn giờ <code>HH:MM</code>.
+        </div>
+      </details>
+    </div>
+
+    <!-- NÚT HÀNH ĐỘNG TRONG MODAL -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+      <button type="button" class="btn btn-outline" onclick="saveEmailGlobalSettings()">💾 Lưu Cài Đặt & Giờ Hẹn Mặc Định</button>
+      <button type="button" id="btn-modal-schedule-sub" class="btn btn-primary" style="width:auto;background:#0284c7;" onclick="triggerSubEmailFromModal('schedule')">⏰ Hẹn Giờ Gửi Lúc HH:MM</button>
+      <button type="button" id="btn-modal-send-sub" class="btn btn-success" onclick="triggerSubEmailFromModal('now')">🚀 Gửi Email Đính Kèm PDF Ngay</button>
+    </div>
   </div>
 </div>
 
@@ -1365,28 +1518,38 @@
       box.innerHTML = cachedSubmissions.map(s => {
         const isDone = s.status === "completed";
         const statusBadge = isDone
-          ? `<span style="background:rgba(22,163,74,0.2);color:#4ade80;padding:4px 10px;border-radius:99px;font-size:11px;font-weight:700;">✓ Đã có Báo Cáo từ PySide6</span>`
-          : `<span style="background:rgba(234,179,8,0.2);color:#facc15;padding:4px 10px;border-radius:99px;font-size:11px;font-weight:700;">⏳ Đang xử lý trên PySide6...</span>`;
+          ? `<span style="background:rgba(22,163,74,0.2);color:#4ade80;padding:4px 10px;border-radius:99px;font-size:11px;font-weight:700;">✓ Đã có Báo Cáo & PDF</span>`
+          : `<span style="background:rgba(234,179,8,0.2);color:#facc15;padding:4px 10px;border-radius:99px;font-size:11px;font-weight:700;">⏳ Đang xử lý...</span>`;
         const imgUrl = isDone && s.report_image_url ? s.report_image_url : s.input_image_url;
+
+        let emailBadge = "";
+        if (s.email_status === "sent" || (s.email_status && s.email_status.startsWith("outbox"))) {
+          emailBadge = `<div style="margin-top:4px;font-size:11px;color:#4ade80;font-weight:700;">📧 Đã gửi Email PDF tới: ${s.email_recipients || ""} (${s.email_sent_at || ""})</div>`;
+        } else if (s.email_status === "scheduled" && s.email_schedule_hhmm) {
+          emailBadge = `<div style="margin-top:4px;font-size:11px;color:#facc15;font-weight:700;">⏰ Đã hẹn giờ tự động gửi Email lúc <b>${s.email_schedule_hhmm}</b> -> ${s.email_recipients || ""}</div>`;
+        }
 
         return `
           <div class="shared-card">
-            ${imgUrl ? `<img src="${imgUrl}" onclick="openReportById(${s.id})" />` : ""}
+            ${imgUrl ? `<img src="${imgUrl}" loading="lazy" onclick="openReportById(${s.id})" />` : ""}
             <div class="shared-card-body">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
                 <span style="font-size:12px;color:var(--primary-light);font-weight:700;">#BC-${String(s.id).padStart(4,'0')}</span>
                 ${statusBadge}
               </div>
               <h4 style="margin:0 0 6px;font-size:15px;">${s.title}</h4>
-              <p style="margin:0 0 10px;font-size:12px;color:var(--muted);flex:1;">
-                ${isDone ? `<b>Kết quả PySide6:</b> ${s.report_summary}` : `Ghi chú gửi: ${s.note_text || "Ghi chú vẽ tay"}`}
+              <p style="margin:0 0 8px;font-size:12px;color:var(--muted);flex:1;">
+                ${isDone ? `<b>Kết quả Python:</b> ${s.report_summary}` : `Ghi chú gửi: ${s.note_text || "Ghi chú vẽ tay"}`}
+                ${emailBadge}
               </p>
               <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
-                <button class="btn btn-primary" style="flex:1;padding:9px;font-size:12px;" onclick="openReportById(${s.id})">
-                  📄 Xem Chi Tiết
+                <button class="btn btn-primary" style="flex:1;padding:8px;font-size:11.5px;" onclick="openReportById(${s.id})">
+                  📄 Chi Tiết
                 </button>
-                ${isDone ? `<button class="btn btn-success" style="padding:9px 12px;font-size:12px;" onclick="downloadSavedReportPdf(${s.id})">📥 Xuất PDF</button>` : ""}
-                ${isDone ? `<button class="btn btn-outline" style="padding:9px 12px;font-size:12px;" onclick="openSavedAllseaReportA4(${s.id})">🖨️ Bản A4</button>` : ""}
+                ${isDone ? `<button class="btn btn-success" style="padding:8px 10px;font-size:11.5px;" onclick="downloadSavedReportPdf(${s.id})">📥 PDF</button>` : ""}
+                ${isDone ? `<button class="btn btn-outline" style="padding:8px 10px;font-size:11.5px;border-color:#22c55e;color:#4ade80;" onclick="openSendEmailForSub(${s.id})">📧 Gửi/Hẹn Mail</button>` : ""}
+                ${isDone ? `<button class="btn btn-outline" style="padding:8px 10px;font-size:11.5px;" onclick="openSavedAllseaReportA4(${s.id})">🖨️ A4</button>` : ""}
+                <button class="btn btn-danger" style="padding:8px 9px;font-size:11px;" title="Xóa báo cáo này" onclick="deleteSubmissionById(${s.id})">🗑️</button>
               </div>
             </div>
           </div>
@@ -1394,6 +1557,17 @@
       }).join("");
     } catch (e) {
       console.error(e);
+    }
+  }
+
+  async function deleteSubmissionById(id) {
+    if (!confirm(`Xóa báo cáo #BC-${String(id).padStart(4,'0')} và các file đính kèm?`)) return;
+    try {
+      await fetch(`/api/submissions/${id}`, { method: "DELETE" });
+      showToast(`🗑️ Đã xóa báo cáo #BC-${String(id).padStart(4,'0')}`);
+      loadSubmissions();
+    } catch (e) {
+      showToast("❌ Không xóa được báo cáo", "#ef4444");
     }
   }
 
@@ -1412,10 +1586,11 @@
       <div style="background:#0f172a;padding:14px;border-radius:12px;border:1px solid var(--border);margin-bottom:14px;">
         <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
           <span style="font-size:13px;color:var(--muted);">Người gửi: <b style="color:#fff">${s.full_name} (${s.username})</b></span>
-          <span style="font-size:13px;color:#4ade80;font-weight:700;">✓ Xử lý bởi: Phần mềm PySide6</span>
+          <span style="font-size:13px;color:#4ade80;font-weight:700;">✓ Xử lý bởi: Phần mềm Python & PySide6</span>
         </div>
-        <div style="font-size:14px;color:#38bdf8;font-weight:700;margin-bottom:4px;">Kết luận tự động từ PySide6:</div>
+        <div style="font-size:14px;color:#38bdf8;font-weight:700;margin-bottom:4px;">Kết luận tự động từ Python:</div>
         <div style="font-size:13px;color:#e2e8f0;">${s.report_summary || "Đang xử lý..."}</div>
+        ${s.email_recipients ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid #334155;font-size:12px;color:#facc15;">📧 Trạng thái Email: <b>${s.email_status || 'Chưa gửi'}</b> | Người nhận: <b>${s.email_recipients}</b> ${s.email_schedule_hhmm ? `(Giờ hẹn: ${s.email_schedule_hhmm})` : ''}</div>` : ''}
       </div>
 
       ${metricsHtml ? `
@@ -1432,8 +1607,9 @@
       ` : ""}
 
       <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;">
-        <button class="btn btn-success" onclick="downloadSavedReportPdf(${s.id})">📥 Tải File PDF (.pdf) Về Điện Thoại / Máy Tính</button>
-        ${(s.report_html_url || repData.form_data) ? `<button class="btn btn-primary" style="width:auto;" onclick="openSavedAllseaReportA4(${s.id})">🖨️ Mở Bản In Chuẩn A4</button>` : ""}
+        <button class="btn btn-success" onclick="downloadSavedReportPdf(${s.id})">📥 Tải File PDF (.pdf)</button>
+        <button class="btn btn-primary" style="width:auto;background:#15803d;" onclick="closeReportModal();openSendEmailForSub(${s.id})">📧 Gửi Email / Hẹn Giờ (HH:MM)</button>
+        ${(s.report_html_url || repData.form_data) ? `<button class="btn btn-primary" style="width:auto;" onclick="openSavedAllseaReportA4(${s.id})">🖨️ Mở Bản A4 (Sửa Trực Tiếp)</button>` : ""}
         <button class="btn btn-outline" onclick="closeReportModal()">Đóng</button>
       </div>
     `;
@@ -1546,6 +1722,9 @@
         } else if (msg.event === "submission_completed") {
           loadSubmissions();
           showToast(`✅ PySide6 đã xử lý xong & trả Báo cáo: "${msg.data.title}"!`, "#16a34a");
+        } else if (msg.event === "email_delivered") {
+          loadSubmissions();
+          showToast(`📧 Đã gửi Email báo cáo PDF tới: ${msg.data.recipients}!`, "#16a34a");
         } else if (msg.event === "users_updated") {
           if (currentUser?.role === "admin") loadUsersAdmin();
         }
@@ -1560,7 +1739,10 @@
   let allseaRows = [];
   let allseaPhotos = [];
   let customLogoDataUrl = "";
+  let savedEmailContacts = [];
+  let cachedEmailSettings = {};
   const OFFLINE_QUEUE_KEY = "allsea_offline_reports_queue_v1";
+  const LOCAL_CONTACTS_KEY = "allsea_saved_email_contacts_v1";
 
   function initAllseaDailyForm() {
     const today = new Date();
@@ -1580,6 +1762,7 @@
     renderAllseaPhotosGrid();
     updateOnlineStatusBadge();
     renderOfflineQueueBanner();
+    loadEmailSettingsAndContacts();
   }
 
   window.addEventListener("online", () => {
@@ -1840,56 +2023,17 @@
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
     e.target.value = "";
-    showToast(`⏳ Đang nén và căn chỉnh ${files.length} ảnh tốc độ cao...`);
-    const compressedList = await Promise.all(files.map(f => compressSingleFileToDataUrl(f, 800, 0.78)));
+    const modeEl = document.getElementById("photo-compress-mode");
+    const isFast4G = !modeEl || modeEl.value === "fast_4g";
+    const maxDim = isFast4G ? 640 : 880;
+    const quality = isFast4G ? 0.72 : 0.82;
+    showToast(`⏳ Đang nén siêu tốc (${isFast4G ? 'Chế độ 4G/5G' : 'Wi-Fi HQ'}) cho ${files.length} ảnh...`);
+    const compressedList = await Promise.all(files.map(f => compressSingleFileToDataUrl(f, maxDim, quality)));
     compressedList.forEach((dataUrl) => {
       if (dataUrl) allseaPhotos.push({ src: dataUrl, caption: "" });
     });
     renderAllseaPhotosGrid();
-    showToast(`📷 Đã thêm ${files.length} ảnh (Tổng: ${allseaPhotos.length} ảnh) vào khung báo cáo!`, "#16a34a");
-  }
-
-  async function loadSample12Photos() {
-    const sampleShips = [
-      "LS_JUPITER.jpg", "LS_MERCURY.jpg", "LS_NEPTUNE.jpg", "LS_URANUS.jpg",
-      "LS_VENUS.jpg", "GT_EQUALITY.jpg", "GT_PEACE.jpg", "GT_VICTORY.jpg",
-      "GT_WIN.jpg", "MG_01.jpg", "MG_02.jpg", "MG_03.jpg"
-    ];
-    showToast("⏳ Đang tạo 12 ảnh mẫu hiện trường tàu Allsea...");
-    const loaded = await Promise.all(sampleShips.map((fname, i) => new Promise((resolve) => {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      const label = fname.replace(".jpg", "").replace(/_/g, " ");
-      img.onload = () => {
-        const c = document.createElement("canvas");
-        c.width = 480;
-        c.height = 340;
-        const cctx = c.getContext("2d");
-        cctx.drawImage(img, 0, 0, 480, 340);
-        cctx.fillStyle = "rgba(15,23,42,0.78)";
-        cctx.fillRect(0, 300, 480, 40);
-        cctx.fillStyle = "#38bdf8";
-        cctx.font = "bold 15px Segoe UI, Arial";
-        cctx.fillText(`Hạng mục #${i + 1}: Kiểm tra kỹ thuật ${label}`, 12, 325);
-        resolve({ src: c.toDataURL("image/jpeg", 0.78), caption: `Ảnh hiện trường #${i + 1} (${label})` });
-      };
-      img.onerror = () => {
-        const c = document.createElement("canvas");
-        c.width = 480;
-        c.height = 340;
-        const cctx = c.getContext("2d");
-        cctx.fillStyle = "#1e293b";
-        cctx.fillRect(0, 0, 480, 340);
-        cctx.fillStyle = "#38bdf8";
-        cctx.font = "bold 18px Arial";
-        cctx.fillText(`ALLSEA PHOTO #${i + 1}`, 140, 170);
-        resolve({ src: c.toDataURL("image/jpeg", 0.78), caption: `Ảnh hiện trường #${i + 1}` });
-      };
-      img.src = fname;
-    })));
-    allseaPhotos = loaded;
-    renderAllseaPhotosGrid();
-    showToast("✅ Đã nạp đủ 12 ảnh hiện trường mẫu! Hãy bấm 'GỬI VỀ PYTHON' hoặc 'XUẤT PDF' để kiểm tra ngay.", "#16a34a");
+    showToast(`📷 Đã thêm ${files.length} ảnh (Tổng: ${allseaPhotos.length} ảnh — Tối ưu 4G/5G) vào báo cáo!`, "#16a34a");
   }
 
   function clearAllseaPhotos() {
@@ -1915,8 +2059,8 @@
 
     if (allseaPhotos.length === 0) {
       grid.innerHTML = `
-        <div style="grid-column:1/-1;text-align:center;padding:22px;color:#64748b;font-size:13px;">
-          📷 Chưa có ảnh đính kèm. Bấm <b>"Chụp Ảnh"</b>, <b>"Chọn Nhiều Ảnh"</b> hoặc <b>"⚡ Nạp Thử 12 Ảnh Mẫu"</b> ở góc phải phía trên để thêm ảnh vào báo cáo.
+        <div style="grid-column:1/-1;text-align:center;padding:18px;color:#64748b;font-size:13px;">
+          📷 Chưa có ảnh đính kèm. Bấm <b>"Chụp Ảnh (Camera)"</b> hoặc <b>"Chọn Nhiều Ảnh Từ Máy"</b> ở góc phải phía trên để thêm ảnh vào báo cáo.
         </div>
       `;
       return;
@@ -1934,34 +2078,315 @@
     `).join("");
   }
 
+  function getSelectedEmailMode() {
+    const radios = document.querySelectorAll('input[name="email_send_mode"]');
+    for (const r of radios) {
+      if (r.checked) return r.value;
+    }
+    return "none";
+  }
+
+  function toggleEmailScheduleTimeBox() {
+    const mode = getSelectedEmailMode();
+    const timeInp = document.getElementById("email-schedule-hhmm");
+    if (timeInp) {
+      timeInp.style.opacity = mode === "schedule" ? "1" : "0.65";
+    }
+  }
+
   function collectAllseaFormPayload() {
-    const ship_name = (document.getElementById("allsea-ship-name").value || "LS JUPITER").trim();
-    const reporter = (document.getElementById("allsea-reporter").value || "Mr. XUÂN ANH").trim();
-    const item_type = (document.getElementById("allsea-item-detail").value || document.getElementById("allsea-item-drop").value || "DAILY REPORT").trim();
-    const report_date = (document.getElementById("allsea-report-date").value || "").trim();
-    const report_header_title = (document.getElementById("allsea-report-header-title").value || "BÁO CÁO NGÀY").trim();
-    const arising_text = (document.getElementById("allsea-arising").value || "").trim();
+    const company_title = document.getElementById("allsea-company-title").value;
+    const company_subtitle = document.getElementById("allsea-company-subtitle").value;
+    const report_header_title = document.getElementById("allsea-report-header-title").value;
+    const label_ship = document.getElementById("allsea-label-ship").value;
+    const ship_name = document.getElementById("allsea-ship-name").value;
+    const label_reporter = document.getElementById("allsea-label-reporter").value;
+    const reporter = document.getElementById("allsea-reporter").value;
+    const label_items = document.getElementById("allsea-label-items").value;
+    const item_type = document.getElementById("allsea-item-detail").value;
+    const salutation = document.getElementById("allsea-salutation").value;
+    const report_date = document.getElementById("allsea-report-date").value;
+    const sec_a_title = document.getElementById("allsea-sec-a-title").value;
+    const arising_text = document.getElementById("allsea-arising").value;
+    const sec_b_title = document.getElementById("allsea-sec-b-title").value;
+    const sec_c_title = document.getElementById("allsea-sec-c-title").value;
+    const footer_note = document.getElementById("allsea-footer-note").value;
     const headers = [
-      document.getElementById("hdr-col-0").value || "STT",
-      document.getElementById("hdr-col-1").value || "NỘI DUNG CÔNG VIỆC",
-      document.getElementById("hdr-col-2").value || "PHƯƠNG ÁN",
-      document.getElementById("hdr-col-3").value || "TIẾN ĐỘ DỰ KIẾN"
+      document.getElementById("hdr-col-0").value,
+      document.getElementById("hdr-col-1").value,
+      document.getElementById("hdr-col-2").value,
+      document.getElementById("hdr-col-3").value
     ];
+
+    const emailMode = getSelectedEmailMode();
+    const emailRecipients = (document.getElementById("email-recipients-input")?.value || "").trim();
+    const emailSubject = (document.getElementById("email-subject-input")?.value || "").trim();
+    const emailScheduleHhmm = (document.getElementById("email-schedule-hhmm")?.value || "17:00").trim();
+
     return {
       template: "ALLSEA_DAILY_REPORT",
       logo_url: customLogoDataUrl || "/allsea_logo.png",
-      company_title: "ALLSEA MANAGEMENT JSC",
+      company_title,
+      company_subtitle,
       report_header_title,
+      label_ship,
       ship_name,
+      label_reporter,
       reporter,
+      label_items,
       item_type,
+      salutation,
       report_date,
+      sec_a_title,
       arising_text,
+      sec_b_title,
       headers,
       rows: JSON.parse(JSON.stringify(allseaRows)),
+      sec_c_title,
       photos: JSON.parse(JSON.stringify(allseaPhotos)),
+      footer_note,
+      email_options: {
+        action: emailMode,
+        recipients: emailRecipients,
+        subject: emailSubject || `[${company_title || 'ALLSEA'}] ${report_header_title || 'BÁO CÁO'} - ${ship_name || ''} (${report_date || ''})`,
+        schedule_hhmm: emailScheduleHhmm
+      },
       saved_at: new Date().toLocaleString("vi-VN")
     };
+  }
+
+  /* ==================== QUẢN LÝ DANH BẠ EMAIL LƯU SẴN & HẸN GIỜ GỬI MAIL HH:MM ==================== */
+  async function loadEmailSettingsAndContacts() {
+    try {
+      const localRaw = localStorage.getItem(LOCAL_CONTACTS_KEY);
+      if (localRaw) savedEmailContacts = JSON.parse(localRaw);
+    } catch (e) {}
+
+    try {
+      const res = await fetch("/api/email/settings");
+      if (res.ok) {
+        const data = await res.json();
+        cachedEmailSettings = data.settings || {};
+        if (data.contacts && data.contacts.length) {
+          savedEmailContacts = data.contacts;
+          try { localStorage.setItem(LOCAL_CONTACTS_KEY, JSON.stringify(savedEmailContacts)); } catch (e) {}
+        }
+        const recInp = document.getElementById("email-recipients-input");
+        if (recInp && !recInp.value && cachedEmailSettings.default_recipients) {
+          recInp.value = cachedEmailSettings.default_recipients;
+        }
+        const hhmmInp = document.getElementById("email-schedule-hhmm");
+        if (hhmmInp && cachedEmailSettings.schedule_time_hhmm) {
+          hhmmInp.value = cachedEmailSettings.schedule_time_hhmm;
+        }
+      }
+    } catch (e) {}
+    renderSavedEmailChips();
+  }
+
+  function renderSavedEmailChips() {
+    const bar = document.getElementById("saved-email-chips");
+    const modalBar = document.getElementById("modal-saved-contacts-list");
+    const currentRecs = (document.getElementById("email-recipients-input")?.value || "").toLowerCase();
+
+    const html = savedEmailContacts.map(c => {
+      const isSelected = currentRecs.includes((c.email || "").toLowerCase());
+      return `
+        <span style="display:inline-flex;align-items:center;gap:4px;background:${isSelected ? '#16a34a' : '#fff'};color:${isSelected ? '#fff' : '#0f172a'};border:1px solid ${isSelected ? '#15803d' : '#86efac'};border-radius:99px;padding:3px 10px;font-size:11.5px;font-weight:700;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,0.05);"
+              onclick="toggleRecipientEmail('${c.email.replace(/'/g, "\\'")}')"
+              title="Bấm để chọn / bỏ chọn ${c.email}">
+          <span>${isSelected ? '✓' : '+'} ${c.label || c.email.split('@')[0]} (${c.email})</span>
+          <b onclick="event.stopPropagation();deleteSavedContact(${c.id || 0}, '${c.email.replace(/'/g, "\\'")}')" style="margin-left:4px;color:${isSelected ? '#dcfce7' : '#dc2626'};cursor:pointer;" title="Xóa khỏi danh bạ">×</b>
+        </span>
+      `;
+    }).join("");
+
+    if (bar) bar.innerHTML = html || `<span style="font-size:11px;color:#64748b;">Chưa có email lưu sẵn. Hãy nhập email bên dưới rồi bấm <b>➕ Lưu</b>.</span>`;
+    if (modalBar) modalBar.innerHTML = html || `<span style="font-size:11px;color:#64748b;">Chưa có email lưu sẵn.</span>`;
+  }
+
+  function toggleRecipientEmail(email) {
+    const targets = ["email-recipients-input", "modal-email-recipients"];
+    targets.forEach(id => {
+      const inp = document.getElementById(id);
+      if (!inp) return;
+      let parts = inp.value.split(/[,;]+/).map(x => x.trim()).filter(Boolean);
+      const idx = parts.findIndex(x => x.toLowerCase() === email.toLowerCase());
+      if (idx >= 0) {
+        parts.splice(idx, 1);
+      } else {
+        parts.push(email);
+      }
+      inp.value = parts.join(", ");
+    });
+    renderSavedEmailChips();
+  }
+
+  async function quickSaveCurrentEmailContact() {
+    const inp = document.getElementById("email-recipients-input");
+    const raw = (inp?.value || "").trim();
+    if (!raw) return showToast("⚠️ Hãy nhập địa chỉ Email vào ô Người nhận trước khi bấm Lưu!", "#ef4444");
+    const emails = raw.split(/[,;]+/).map(x => x.trim()).filter(x => x.includes("@"));
+    if (!emails.length) return showToast("⚠️ Địa chỉ Email không hợp lệ!", "#ef4444");
+
+    for (const em of emails) {
+      const label = em.split("@")[0];
+      try {
+        const res = await fetch("/api/email/contacts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ label, email: em })
+        });
+        if (res.ok) {
+          const d = await res.json();
+          if (d.contacts) savedEmailContacts = d.contacts;
+        }
+      } catch (e) {
+        if (!savedEmailContacts.some(c => c.email.toLowerCase() === em.toLowerCase())) {
+          savedEmailContacts.push({ id: Date.now(), label, email: em });
+        }
+      }
+    }
+    try { localStorage.setItem(LOCAL_CONTACTS_KEY, JSON.stringify(savedEmailContacts)); } catch (e) {}
+    renderSavedEmailChips();
+    showToast(`✅ Đã lưu ${emails.length} địa chỉ Email vào danh bạ chọn nhanh!`, "#16a34a");
+  }
+
+  async function addNewContactFromModal() {
+    const label = (document.getElementById("new-contact-name").value || "").trim();
+    const email = (document.getElementById("new-contact-email").value || "").trim();
+    if (!email || !email.includes("@")) return showToast("⚠️ Vui lòng nhập địa chỉ Email hợp lệ!", "#ef4444");
+    try {
+      const res = await fetch("/api/email/contacts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ label: label || email.split("@")[0], email })
+      });
+      if (res.ok) {
+        const d = await res.json();
+        if (d.contacts) savedEmailContacts = d.contacts;
+      }
+    } catch (e) {}
+    document.getElementById("new-contact-name").value = "";
+    document.getElementById("new-contact-email").value = "";
+    // Đồng thời thêm luôn vào ô người nhận
+    toggleRecipientEmail(email);
+    showToast(`✅ Đã lưu '${email}' vào danh bạ!`, "#16a34a");
+  }
+
+  async function deleteSavedContact(id, email) {
+    if (id) {
+      try { await fetch(`/api/email/contacts/${id}`, { method: "DELETE" }); } catch (e) {}
+    }
+    savedEmailContacts = savedEmailContacts.filter(c => c.email.toLowerCase() !== (email || "").toLowerCase());
+    try { localStorage.setItem(LOCAL_CONTACTS_KEY, JSON.stringify(savedEmailContacts)); } catch (e) {}
+    renderSavedEmailChips();
+    showToast(`🗑️ Đã xóa ${email} khỏi danh bạ.`);
+  }
+
+  function openEmailSettingsModal() {
+    document.getElementById("modal-email-sub-id").value = "";
+    document.getElementById("email-modal-title").innerHTML = "⚙️ Cài Đặt Mail SMTP, Danh Bạ & Giờ Tự Động Gửi Hàng Ngày (HH:MM)";
+    document.getElementById("modal-email-recipients").value = document.getElementById("email-recipients-input")?.value || cachedEmailSettings.default_recipients || "";
+    document.getElementById("modal-email-subject").value = document.getElementById("email-subject-input")?.value || cachedEmailSettings.default_subject || "[ALLSEA REPORT] Báo cáo kỹ thuật tàu - Đính kèm PDF";
+    document.getElementById("modal-email-body").value = cachedEmailSettings.default_body || "Kính gửi Ban Lãnh Đạo,\nHệ thống Python đã xử lý xong Báo cáo và đính kèm file PDF chuẩn A4 trong email này.";
+    document.getElementById("modal-auto-daily-enabled").checked = !!cachedEmailSettings.auto_send_enabled;
+    document.getElementById("modal-daily-hhmm").value = cachedEmailSettings.schedule_time_hhmm || document.getElementById("email-schedule-hhmm")?.value || "17:00";
+    document.getElementById("modal-smtp-host").value = cachedEmailSettings.smtp_host || "smtp.gmail.com";
+    document.getElementById("modal-smtp-port").value = cachedEmailSettings.smtp_port || 587;
+    document.getElementById("modal-smtp-user").value = cachedEmailSettings.smtp_user || "";
+    document.getElementById("modal-smtp-pass").value = cachedEmailSettings.smtp_pass || "";
+
+    document.getElementById("btn-modal-schedule-sub").style.display = "none";
+    document.getElementById("btn-modal-send-sub").style.display = "none";
+    renderSavedEmailChips();
+    document.getElementById("email-modal").style.display = "flex";
+  }
+
+  function openSendEmailForSub(subId) {
+    const s = cachedSubmissions.find(x => x.id === subId);
+    if (!s) return;
+    document.getElementById("modal-email-sub-id").value = String(subId);
+    document.getElementById("email-modal-title").innerHTML = `📧 Gửi / Hẹn Giờ Email Báo Cáo #BC-${String(subId).padStart(4,'0')}`;
+    document.getElementById("modal-email-recipients").value = s.email_recipients || document.getElementById("email-recipients-input")?.value || cachedEmailSettings.default_recipients || "";
+    document.getElementById("modal-email-subject").value = s.email_subject || `[ALLSEA REPORT] ${s.title}`;
+    document.getElementById("modal-email-body").value = `Kính gửi Ban Lãnh Đạo,\nĐính kèm là file Báo cáo PDF chuẩn A4: ${s.title}.\nTóm tắt: ${s.report_summary || ''}`;
+    document.getElementById("modal-daily-hhmm").value = s.email_schedule_hhmm || document.getElementById("email-schedule-hhmm")?.value || "17:00";
+
+    document.getElementById("btn-modal-schedule-sub").style.display = "inline-flex";
+    document.getElementById("btn-modal-send-sub").style.display = "inline-flex";
+    renderSavedEmailChips();
+    document.getElementById("email-modal").style.display = "flex";
+  }
+
+  function closeEmailModal() {
+    document.getElementById("email-modal").style.display = "none";
+  }
+
+  async function saveEmailGlobalSettings() {
+    const payload = {
+      smtp_host: document.getElementById("modal-smtp-host").value.trim() || "smtp.gmail.com",
+      smtp_port: parseInt(document.getElementById("modal-smtp-port").value || "587", 10),
+      smtp_user: document.getElementById("modal-smtp-user").value.trim(),
+      smtp_pass: document.getElementById("modal-smtp-pass").value.trim(),
+      sender_name: "ALLSEA REPORT SYSTEM",
+      default_recipients: document.getElementById("modal-email-recipients").value.trim(),
+      default_subject: document.getElementById("modal-email-subject").value.trim(),
+      default_body: document.getElementById("modal-email-body").value.trim(),
+      auto_send_enabled: document.getElementById("modal-auto-daily-enabled").checked ? 1 : 0,
+      schedule_time_hhmm: document.getElementById("modal-daily-hhmm").value || "17:00"
+    };
+    try {
+      const res = await fetch("/api/email/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        cachedEmailSettings = payload;
+        const formRec = document.getElementById("email-recipients-input");
+        if (formRec) formRec.value = payload.default_recipients;
+        const formHhmm = document.getElementById("email-schedule-hhmm");
+        if (formHhmm) formHhmm.value = payload.schedule_time_hhmm;
+        await loadEmailSettingsAndContacts();
+        showToast(`✅ Đã lưu cài đặt Email & Giờ hẹn tự động (${payload.schedule_time_hhmm})!`, "#16a34a");
+        if (!document.getElementById("modal-email-sub-id").value) closeEmailModal();
+      }
+    } catch (e) {
+      showToast("❌ Không lưu được cài đặt Email", "#ef4444");
+    }
+  }
+
+  async function triggerSubEmailFromModal(mode) {
+    const subId = parseInt(document.getElementById("modal-email-sub-id").value || "0", 10);
+    if (!subId) return saveEmailGlobalSettings();
+    const recipients = document.getElementById("modal-email-recipients").value.trim();
+    const subject = document.getElementById("modal-email-subject").value.trim();
+    const body = document.getElementById("modal-email-body").value.trim();
+    const schedule_hhmm = document.getElementById("modal-daily-hhmm").value || "17:00";
+
+    if (!recipients) return showToast("⚠️ Vui lòng nhập hoặc chọn ít nhất 1 địa chỉ Email người nhận!", "#ef4444");
+
+    try {
+      const res = await fetch("/api/email/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ submission_id: subId, recipients, subject, body, mode, schedule_hhmm })
+      });
+      const data = await res.json();
+      if (!res.ok) return showToast("❌ " + (data.detail || "Lỗi gửi mail"), "#ef4444");
+
+      await loadEmailSettingsAndContacts();
+      await loadSubmissions();
+      closeEmailModal();
+      if (mode === "schedule") {
+        showToast(`⏰ Đã hẹn giờ tự động gửi Email báo cáo #BC-${String(subId).padStart(4,'0')} vào lúc ${schedule_hhmm}!`, "#0284c7");
+      } else {
+        showToast(`📧 ${data.message || 'Đã gửi Email đính kèm PDF thành công!'}`, "#16a34a");
+      }
+    } catch (e) {
+      showToast("❌ Lỗi kết nối khi gửi Email!", "#ef4444");
+    }
   }
 
   /* LƯU OFFLINE TRÊN ĐIỆN THOẠI APK & TỰ ĐỘNG GỬI KHI CÓ MẠNG */
@@ -2033,12 +2458,25 @@
     const item = queue[idx];
     if (!item || !item.payload) return;
     const p = item.payload;
-    document.getElementById("allsea-report-header-title").value = p.report_header_title || "BÁO CÁO NGÀY";
-    document.getElementById("allsea-ship-name").value = p.ship_name || "LS JUPITER";
-    document.getElementById("allsea-reporter").value = p.reporter || "Mr. XUÂN ANH";
-    document.getElementById("allsea-item-detail").value = p.item_type || "DAILY REPORT";
-    document.getElementById("allsea-report-date").value = p.report_date || "";
-    document.getElementById("allsea-arising").value = p.arising_text || "";
+    if (p.company_title !== undefined) document.getElementById("allsea-company-title").value = p.company_title;
+    if (p.company_subtitle !== undefined) document.getElementById("allsea-company-subtitle").value = p.company_subtitle;
+    if (p.report_header_title !== undefined) document.getElementById("allsea-report-header-title").value = p.report_header_title;
+    if (p.label_ship !== undefined) document.getElementById("allsea-label-ship").value = p.label_ship;
+    if (p.ship_name !== undefined) document.getElementById("allsea-ship-name").value = p.ship_name;
+    if (p.label_reporter !== undefined) document.getElementById("allsea-label-reporter").value = p.label_reporter;
+    if (p.reporter !== undefined) document.getElementById("allsea-reporter").value = p.reporter;
+    if (p.label_items !== undefined) document.getElementById("allsea-label-items").value = p.label_items;
+    if (p.item_type !== undefined) document.getElementById("allsea-item-detail").value = p.item_type;
+    if (p.salutation !== undefined) document.getElementById("allsea-salutation").value = p.salutation;
+    if (p.report_date !== undefined) document.getElementById("allsea-report-date").value = p.report_date;
+    if (p.sec_a_title !== undefined) document.getElementById("allsea-sec-a-title").value = p.sec_a_title;
+    if (p.arising_text !== undefined) document.getElementById("allsea-arising").value = p.arising_text;
+    if (p.sec_b_title !== undefined) document.getElementById("allsea-sec-b-title").value = p.sec_b_title;
+    if (p.sec_c_title !== undefined) document.getElementById("allsea-sec-c-title").value = p.sec_c_title;
+    if (p.footer_note !== undefined) document.getElementById("allsea-footer-note").value = p.footer_note;
+    if (p.headers && p.headers.length === 4) {
+      for (let i = 0; i < 4; i++) document.getElementById("hdr-col-" + i).value = p.headers[i];
+    }
     allseaRows = p.rows || [];
     allseaPhotos = p.photos || [];
     renderAllseaWorkTable();
@@ -2079,14 +2517,15 @@
   }
 
   async function sendSingleAllseaPayloadToServer(payload, username) {
-    const title = `${payload.report_header_title} - Tàu ${payload.ship_name} (${payload.report_date})`;
-    const note_text = `Người báo cáo: ${payload.reporter} | Items: ${payload.item_type} | ${payload.rows.length} hạng mục | ${payload.photos.length} ảnh`;
+    const title = `${payload.report_header_title || 'BÁO CÁO'} - ${payload.ship_name || ''} (${payload.report_date || ''})`;
+    const note_text = `${payload.label_reporter || 'Người báo cáo:'} ${payload.reporter} | ${payload.label_items || 'Items:'} ${payload.item_type} | ${payload.rows.length} hạng mục | ${payload.photos.length} ảnh`;
     const bodyObj = {
       username: username || (currentUser ? currentUser.username : "nhanvien1"),
       title,
       note_text,
       task_type: payload.item_type,
-      payload
+      payload,
+      email_options: payload.email_options || {}
     };
 
     const res = await fetch("/api/submissions-json", {
@@ -2098,7 +2537,6 @@
     if (!res.ok) throw new Error(data.detail || "Lỗi gửi báo cáo");
 
     const subId = data.submission_id || data.id;
-    // Nếu Server chưa tự xử lý ngay trong bước gửi thì gọi /process
     if (data.status !== "completed") {
       await fetch(`/api/submissions/${subId}/process`, { method: "POST" });
     }
@@ -2113,19 +2551,28 @@
     }
 
     const payload = collectAllseaFormPayload();
+    const emailMode = payload.email_options?.action || "none";
+    if ((emailMode === "send_now" || emailMode === "schedule") && !payload.email_options.recipients) {
+      return showToast("⚠️ Bạn đã chọn Gửi/Hẹn giờ Email, vui lòng nhập hoặc chọn địa chỉ Email người nhận!", "#ef4444");
+    }
+
     const btn = document.getElementById("btn-send-allsea");
     const prog = document.getElementById("submit-progress");
     const progText = document.getElementById("submit-progress-text");
 
     btn.disabled = true;
     prog.style.display = "block";
-    progText.innerHTML = `📤 Đang truyền tốc độ cao <b>${payload.report_header_title} (${payload.ship_name} — ${payload.photos.length} ảnh)</b> về Python xử lý...`;
+    progText.innerHTML = `📤 Đang truyền siêu tốc 4G/5G <b>${payload.report_header_title} (${payload.ship_name} — ${payload.photos.length} ảnh)</b> về Python xử lý...`;
 
     try {
       const subId = await sendSingleAllseaPayloadToServer(payload, currentUser.username);
       btn.disabled = false;
       prog.style.display = "none";
-      showToast(`✅ Python đã xử lý & trả về Báo cáo Tàu ${payload.ship_name} (${payload.photos.length} ảnh)!`, "#16a34a");
+      let msg = `✅ Python đã xử lý & xuất PDF Báo cáo ${payload.ship_name}!`;
+      if (emailMode === "send_now") msg += ` Đã gửi Email tới ${payload.email_options.recipients}!`;
+      if (emailMode === "schedule") msg += ` Đã hẹn giờ gửi Email lúc ${payload.email_options.schedule_hhmm}!`;
+      showToast(msg, "#16a34a");
+      await loadEmailSettingsAndContacts();
       await loadSubmissions();
       switchTab("reports");
       openReportById(subId);
@@ -2138,7 +2585,24 @@
   }
 
   function buildPrintableAllseaHtml(payload, pdfDownloadUrl = "") {
-    const headers = payload.headers || ["STT", "NỘI DUNG CÔNG VIỆC", "PHƯƠNG ÁN", "TIẾN ĐỘ DỰ KIẾN"];
+    const company_title = payload.company_title !== undefined ? payload.company_title : "ALLSEA MANAGEMENT JSC";
+    const company_subtitle = payload.company_subtitle !== undefined ? payload.company_subtitle : "CÔNG TY CỔ PHẦN ALLSEA MANAGEMENT";
+    const report_header_title = payload.report_header_title !== undefined ? payload.report_header_title : "BÁO CÁO NGÀY";
+    const label_ship = payload.label_ship !== undefined ? payload.label_ship : "Ship's name :";
+    const ship_name = payload.ship_name !== undefined ? payload.ship_name : "LS JUPITER";
+    const label_reporter = payload.label_reporter !== undefined ? payload.label_reporter : "Superintendent :";
+    const reporter = payload.reporter !== undefined ? payload.reporter : "Mr. XUÂN ANH";
+    const label_items = payload.label_items !== undefined ? payload.label_items : "Items :";
+    const item_type = payload.item_type !== undefined ? payload.item_type : "DAILY REPORT";
+    const salutation = payload.salutation !== undefined ? payload.salutation : "Kính gửi: BAN LÃNH ĐẠO CÔNG TY.";
+    const report_date = payload.report_date !== undefined ? payload.report_date : "";
+    const sec_a_title = payload.sec_a_title !== undefined ? payload.sec_a_title : "A. HẠNG MỤC PHÁT SINH:";
+    const arising_text = payload.arising_text !== undefined ? payload.arising_text : "";
+    const sec_b_title = payload.sec_b_title !== undefined ? payload.sec_b_title : "B. NỘI DUNG CÔNG VIỆC HẰNG NGÀY:";
+    const sec_c_title = payload.sec_c_title !== undefined ? payload.sec_c_title : "C. MỘT SỐ HÌNH ẢNH SỬA TRONG NGÀY:";
+    const footer_note = payload.footer_note !== undefined ? payload.footer_note : "";
+    const headers = payload.headers || ["STT", "NỘI DUNG CÔNG VIỆC", "PHƯƠNG ÁN SỬA CHỮA", "TIẾN ĐỘ"];
+
     const rowsHtml = (payload.rows || []).map(r => {
       if (r.is_group) {
         return `<tr style="background:#f1f5f9;font-weight:bold;"><td style="text-align:center;">${r.stt || ''}</td><td colspan="3" style="text-transform:uppercase;">${r.work || ''}</td></tr>`;
@@ -2152,7 +2616,7 @@
     }).join("");
 
     const photosHtml = (payload.photos && payload.photos.length) ? `
-      <div style="font-weight:bold;margin:18px 0 8px 18px;font-size:13px;">C. MỘT SỐ HÌNH ẢNH SỬA TRONG NGÀY (${payload.photos.length} ẢNH):</div>
+      ${sec_c_title ? `<div style="font-weight:bold;margin:18px 0 8px 18px;font-size:13px;">${sec_c_title}</div>` : ""}
       <div class="photo-grid">
         ${payload.photos.map(p => `
           <div class="photo-cell">
@@ -2163,7 +2627,8 @@
       </div>
     ` : "";
 
-    const safeFileName = `Bao_Cao_${(payload.ship_name || 'Allsea').replace(/\s+/g, '_')}.pdf`;
+    const footerHtml = footer_note ? `<div style="margin-top:16px;font-size:12.5px;white-space:pre-line;">${footer_note}</div>` : "";
+    const safeFileName = `Bao_Cao_${(ship_name || 'Allsea').replace(/\s+/g, '_')}.pdf`;
     const logoUrl = payload.logo_url || (window.location.origin + "/allsea_logo.png");
 
     return `<!DOCTYPE html>
@@ -2171,11 +2636,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${payload.report_header_title} - ${payload.ship_name}</title>
+<title>${report_header_title} - ${ship_name}</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"><\/script>
 <style>
   body { font-family: 'Tahoma', Arial, sans-serif; margin: 0; padding: 16px; background: #cbd5e1; color: #000; font-size: 13px; }
   .a4 { max-width: 820px; margin: 0 auto; background: #fff; padding: 26px 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+  .a4[contenteditable="true"] { outline: 2px dashed #0284c7; background: #fffef7; }
   .print-bar { max-width: 820px; margin: 0 auto 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; background: #0f172a; padding: 10px 14px; border-radius: 10px; }
   .btn-p { background: #0284c7; color: #fff; border: none; padding: 9px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; text-decoration: none; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; }
   table { width: 100%; border-collapse: collapse; }
@@ -2190,14 +2656,15 @@
   .photo-cell { border: 1px solid #94a3b8; page-break-inside: avoid; }
   .photo-cell img { width: 100%; height: 155px; object-fit: cover; display: block; }
   @media (max-width: 650px) { .photo-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media print { body { background: #fff; padding: 0; } .print-bar { display: none !important; } .a4 { box-shadow: none; padding: 8px; max-width: 100%; } .photo-grid { grid-template-columns: repeat(4, 1fr); } }
+  @media print { body { background: #fff; padding: 0; } .print-bar { display: none !important; } .a4 { box-shadow: none; padding: 8px; max-width: 100%; outline: none !important; } .photo-grid { grid-template-columns: repeat(4, 1fr); } }
 </style>
 </head>
 <body>
 <div class="print-bar">
   <div style="display:flex;gap:8px;flex-wrap:wrap;">
     ${pdfDownloadUrl ? `<a class="btn-p" style="background:#16a34a;" href="${pdfDownloadUrl}" download="${safeFileName}">📥 Tải File PDF (.pdf)</a>` : ""}
-    <button class="btn-p" style="background:#16a34a;" onclick="downloadPdfNow()">📄 Xuất File PDF (.pdf) Trực Tiếp</button>
+    <button class="btn-p" style="background:#16a34a;" onclick="downloadPdfNow()">📄 Xuất File PDF (.pdf) Sau Khi Sửa</button>
+    <button class="btn-p" id="btn-edit-a4" style="background:#d97706;" onclick="toggleEditA4()">✏️ Sửa Chữ Trực Tiếp Trên Trang A4</button>
     <button class="btn-p" onclick="window.print()">🖨️ In Báo Cáo A4</button>
   </div>
   <button class="btn-p" style="background:#475569;" onclick="window.close()">✕ Đóng</button>
@@ -2207,25 +2674,25 @@
     <tr>
       <td style="width:105px;text-align:center;"><img src="${logoUrl}" style="width:68px;height:68px;object-fit:contain;" crossorigin="anonymous" onerror="this.src='allsea_logo.png'"/></td>
       <td style="text-align:center;">
-        <div style="font-size:16px;font-weight:bold;">ALLSEA MANAGEMENT JSC</div>
-        <div style="font-size:12px;font-weight:bold;color:#334155;">CÔNG TY CỔ PHẦN ALLSEA MANAGEMENT</div>
-        <div style="font-size:15px;font-weight:bold;margin-top:4px;text-transform:uppercase;">${payload.report_header_title}</div>
+        ${company_title ? `<div style="font-size:16px;font-weight:bold;">${company_title}</div>` : ""}
+        ${company_subtitle ? `<div style="font-size:12px;font-weight:bold;color:#334155;">${company_subtitle}</div>` : ""}
+        ${report_header_title ? `<div style="font-size:15px;font-weight:bold;margin-top:4px;text-transform:uppercase;">${report_header_title}</div>` : ""}
       </td>
     </tr>
   </table>
   <table class="meta-tbl">
     <tr>
-      <td style="width:52%;"><b>Ship's name :</b> &nbsp;${payload.ship_name}</td>
-      <td style="width:48%;"><b>Superintendent :</b> &nbsp;${payload.reporter}</td>
+      <td style="width:52%;"><b>${label_ship}</b> &nbsp;${ship_name}</td>
+      <td style="width:48%;"><b>${label_reporter}</b> &nbsp;${reporter}</td>
     </tr>
     <tr>
-      <td colspan="2"><b>Items :</b> &nbsp;${payload.item_type}</td>
+      <td colspan="2"><b>${label_items}</b> &nbsp;${item_type}</td>
     </tr>
   </table>
-  <div style="margin:10px 0;">Kính gửi: <b>BAN LÃNH ĐẠO CÔNG TY.</b></div>
-  <div style="font-weight:bold;margin:12px 0;">${payload.report_date}</div>
-  <div style="font-weight:bold;margin:4px 0 4px 18px;">A. HẠNG MỤC PHÁT SINH: <span style="font-weight:normal;">${payload.arising_text || ''}</span></div>
-  <div style="font-weight:bold;margin:4px 0 6px 18px;">B. NỘI DUNG CÔNG VIỆC HẰNG NGÀY:</div>
+  ${salutation ? `<div style="margin:10px 0;font-weight:bold;">${salutation}</div>` : ""}
+  ${report_date ? `<div style="font-weight:bold;margin:12px 0;">${report_date}</div>` : ""}
+  ${(sec_a_title || arising_text) ? `<div style="font-weight:bold;margin:4px 0 4px 18px;">${sec_a_title} <span style="font-weight:normal;">${arising_text}</span></div>` : ""}
+  ${sec_b_title ? `<div style="font-weight:bold;margin:4px 0 6px 18px;">${sec_b_title}</div>` : ""}
   <table class="work-tbl">
     <thead>
       <tr>
@@ -2238,10 +2705,21 @@
     <tbody>${rowsHtml}</tbody>
   </table>
   ${photosHtml}
+  ${footerHtml}
 </div>
 <script>
+function toggleEditA4() {
+  const doc = document.getElementById('a4-doc');
+  const btn = document.getElementById('btn-edit-a4');
+  const isEditing = doc.getAttribute('contenteditable') === 'true';
+  doc.setAttribute('contenteditable', isEditing ? 'false' : 'true');
+  btn.innerHTML = isEditing ? '✏️ Sửa Chữ Trực Tiếp Trên Trang A4' : '✅ Đang Bật Sửa Chữ (Bấm vào chữ bất kỳ để sửa)';
+  btn.style.background = isEditing ? '#d97706' : '#16a34a';
+  if (!isEditing) doc.focus();
+}
 function downloadPdfNow() {
   const el = document.getElementById('a4-doc');
+  el.setAttribute('contenteditable', 'false');
   if (window.html2pdf) {
     html2pdf().set({
       margin: [8, 8, 8, 8],
