@@ -452,11 +452,14 @@ print(res.json())
 
         custom_row = QHBoxLayout()
         self.inp_custom_conclusion = QLineEdit("PySide6 đã xác nhận dữ liệu & ghi chú tay hợp lệ. Phê duyệt xuất báo cáo!")
-        btn_manual_proc = QPushButton("⚙️ Chạy Xử Lý & Xuất Lại Báo Cáo Cho Mục Đang Chọn")
+        btn_manual_proc = QPushButton("⚙️ Chạy Xử Lý & Xuất Lại Báo Cáo")
         btn_manual_proc.setObjectName("btnSuccess")
         btn_manual_proc.clicked.connect(self.manual_reprocess_selected)
+        btn_open_pdf = QPushButton("📄 Mở File PDF Báo Cáo A4")
+        btn_open_pdf.clicked.connect(self.open_selected_sub_pdf)
         custom_row.addWidget(self.inp_custom_conclusion, stretch=1)
         custom_row.addWidget(btn_manual_proc)
+        custom_row.addWidget(btn_open_pdf)
         r_vbox.addLayout(custom_row)
 
         layout.addWidget(left_group, stretch=5)
@@ -839,7 +842,7 @@ print(res.json())
         self.refresh_shared_data()
 
     def check_and_auto_process_submissions(self):
-        r = requests.get(f"{SERVER_URL}/api/submissions", params={"username": "__pyside6__", "role": "admin"}, timeout=2)
+        r = requests.get(f"{SERVER_URL}/api/submissions", params={"username": "__pyside6__", "role": "admin", "light": True}, timeout=2)
         if not r.ok:
             return
         subs = r.json()
@@ -848,26 +851,36 @@ print(res.json())
         for s in subs:
             if s["status"] == "pending" and self.auto_process_enabled and s.get("auto_process", 1) == 1:
                 sub_id = s["id"]
-                self.log_msg(f"⚡ [AUTO-PYSIDE6] Nhận yêu cầu mới #{sub_id} từ '{s['username']}': {s['title']} -> Đang tự động phân tích & xuất Báo cáo...")
+                self.log_msg(f"⚡ [AUTO-PYSIDE6] Nhận yêu cầu mới #{sub_id} từ '{s['username']}': {s['title']} -> Đang tự động phân tích & xuất Báo cáo PDF/A4...")
                 requests.post(
                     f"{SERVER_URL}/api/submissions/{sub_id}/process",
                     data={
-                        "custom_conclusion": f"Phần mềm máy tính PySide6 đã tự động phân tích ảnh & ghi chú tay '{s['title']}' của {s['full_name']}. Kết quả: ĐẠT YÊU CẦU.",
+                        "custom_conclusion": f"Phần mềm máy tính PySide6 đã tự động phân tích ảnh & ghi chú '{s['title']}' của {s['full_name']}. Kết quả: ĐẠT YÊU CẦU.",
                         "processed_by": "PySide6 Desktop Auto-Worker"
                     },
-                    timeout=5
+                    timeout=8
                 )
-                self.log_msg(f"✅ [AUTO-PYSIDE6] Đã xuất Báo cáo #BC-PYSIDE6-{sub_id:04d} và gửi trả về điện thoại của '{s['username']}'!")
+                self.log_msg(f"✅ [AUTO-PYSIDE6] Đã xuất Báo cáo #BC-PYSIDE6-{sub_id:04d} (HTML + PDF) và gửi trả về điện thoại/Web của '{s['username']}'!")
                 need_ui_refresh = True
+
+        max_id = subs[0]["id"] if subs else 0
+        if getattr(self, "_last_max_sub_id", 0) != max_id:
+            if getattr(self, "_last_max_sub_id", 0) > 0 and subs:
+                newest = subs[0]
+                self.log_msg(f"📥 [NHẬN BÁO CÁO MỚI #{newest['id']}] {newest['title']} ({newest.get('note_text','')}) -> Đã xuất PDF/A4 trả về App!")
+            self._last_max_sub_id = max_id
+            need_ui_refresh = True
 
         if len(subs) != self.tbl_subs.rowCount() or need_ui_refresh:
             self.populate_submissions_table(subs)
 
     def refresh_submissions(self):
         try:
-            r = requests.get(f"{SERVER_URL}/api/submissions", params={"username": "__pyside6__", "role": "admin"}, timeout=2)
+            r = requests.get(f"{SERVER_URL}/api/submissions", params={"username": "__pyside6__", "role": "admin", "light": True}, timeout=2)
             if r.ok:
-                self.populate_submissions_table(r.json())
+                subs = r.json()
+                self._last_max_sub_id = subs[0]["id"] if subs else 0
+                self.populate_submissions_table(subs)
         except Exception:
             pass
 
@@ -930,6 +943,22 @@ print(res.json())
             return
         sub_id = self._cached_subs[row_idx]["id"]
         self.process_single_sub(sub_id)
+
+    def open_selected_sub_pdf(self):
+        row_idx = self.tbl_subs.currentRow()
+        if row_idx < 0 or not hasattr(self, "_cached_subs"):
+            if hasattr(self, "_cached_subs") and self._cached_subs:
+                row_idx = 0
+            else:
+                QMessageBox.information(self, "Thông báo", "Chưa có báo cáo nào để mở!")
+                return
+        s = self._cached_subs[row_idx]
+        target = s.get("report_pdf_url") or s.get("report_html_url")
+        if target:
+            import webbrowser
+            webbrowser.open(f"{SERVER_URL}{target}")
+        else:
+            QMessageBox.information(self, "Thông báo", "Mục này chưa có file PDF/HTML, hãy bấm xử lý trước!")
 
     def refresh_users(self):
         try:
